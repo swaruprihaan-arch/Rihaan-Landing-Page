@@ -1,0 +1,12 @@
+{
+  "name": "rihaan-landing-page",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static landing page for rihaan.net, served by a dependency-free Node server on Railway.",
+  "license": "MIT",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  }
+}

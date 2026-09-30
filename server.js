@@ -1,0 +1,105 @@
+/* Minimal production static server for Railway. No dependencies.
+   - Binds to process.env.PORT on 0.0.0.0
+   - Serves this directory; "/" -> index.html, "/dir/" -> dir/index.html
+   - Also resolves clean URLs ("/contact" -> contact.html) without changing
+     the existing .html URLs
+   - Blocks path traversal and dotfiles, returns 404.html for misses
+   - GET /healthz -> 200 "ok" for Railway health checks */
+'use strict';
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+
+const ROOT = __dirname;
+const PORT = Number(process.env.PORT) || 3000;
+const HOST = '0.0.0.0';
+
+const MIME = {
+  '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml',
+  '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif',
+  '.webp': 'image/webp', '.ico': 'image/x-icon', '.txt': 'text/plain; charset=utf-8',
+  '.woff': 'font/woff', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.otf': 'font/otf',
+  '.pdf': 'application/pdf', '.bin': 'application/octet-stream',
+  '.mpd': 'text/plain; charset=utf-8', '.ldr': 'text/plain; charset=utf-8',
+  '.md': 'text/markdown; charset=utf-8', '.xml': 'application/xml', '.webmanifest': 'application/manifest+json'
+};
+const SKIP = new Set(['server.js', 'package.json', 'package-lock.json', 'embed-fonts.py', 'railway.json', 'LICENSE']);
+
+function send(res, status, body, type, extra) {
+  const headers = Object.assign({ 'Content-Type': type, 'Content-Length': Buffer.byteLength(body), 'X-Content-Type-Options': 'nosniff' }, extra || {});
+  res.writeHead(status, headers);
+  res.end(body);
+}
+
+function streamFile(req, res, file, status) {
+  const ext = path.extname(file).toLowerCase();
+  const type = MIME[ext] || 'application/octet-stream';
+  const stat = fs.statSync(file);
+  const immutable = /^\/(assets|projects)\//.test(req.url) && ext !== '.html';
+  const headers = {
+    'Content-Type': type,
+    'Content-Length': stat.size,
+    'Last-Modified': stat.mtime.toUTCString(),
+    'X-Content-Type-Options': 'nosniff',
+    'Cache-Control': ext === '.html' ? 'no-cache' : (immutable ? 'public, max-age=86400' : 'public, max-age=3600')
+  };
+  if (req.headers['if-modified-since'] && new Date(req.headers['if-modified-since']) >= new Date(Math.floor(stat.mtimeMs / 1000) * 1000)) {
+    res.writeHead(304, headers); res.end(); return;
+  }
+  res.writeHead(status || 200, headers);
+  if (req.method === 'HEAD') { res.end(); return; }
+  fs.createReadStream(file).pipe(res);
+}
+
+function notFound(req, res) {
+  const page = path.join(ROOT, '404.html');
+  if (fs.existsSync(page)) { streamFile(req, res, page, 404); return; }
+  send(res, 404, 'Not found', 'text/plain; charset=utf-8');
+}
+
+function resolve(urlPath) {
+  let decoded;
+  try { decoded = decodeURIComponent(urlPath); } catch (e) { return null; }
+  if (decoded.includes('\0')) return null;
+  const rel = path.posix.normalize(decoded).replace(/^(\.\.(\/|$))+/, '');
+  if (rel.split('/').some((seg) => seg.startsWith('.') && seg !== '.' && seg !== '')) return null;
+  const abs = path.join(ROOT, rel);
+  if (!abs.startsWith(ROOT + path.sep) && abs !== ROOT) return null;
+  if (SKIP.has(path.relative(ROOT, abs))) return null;
+
+  const candidates = [];
+  if (rel.endsWith('/') || rel === '') candidates.push(path.join(abs, 'index.html'));
+  else {
+    candidates.push(abs);
+    if (!path.extname(abs)) { candidates.push(abs + '.html'); candidates.push(path.join(abs, 'index.html')); }
+  }
+  for (const c of candidates) {
+    try { const st = fs.statSync(c); if (st.isFile()) return c; } catch (e) { /* next */ }
+  }
+  return null;
+}
+
+const server = http.createServer((req, res) => {
+  if (req.method !== 'GET' && req.method !== 'HEAD') { send(res, 405, 'Method not allowed', 'text/plain; charset=utf-8', { Allow: 'GET, HEAD' }); return; }
+  const url = new URL(req.url, 'http://localhost');
+  if (url.pathname === '/healthz') { send(res, 200, 'ok', 'text/plain; charset=utf-8', { 'Cache-Control': 'no-store' }); return; }
+
+  const file = resolve(url.pathname);
+  if (!file) { notFound(req, res); return; }
+
+  /* Directory requested without trailing slash: redirect so relative links resolve */
+  if (path.basename(file) === 'index.html' && !url.pathname.endsWith('/') && !url.pathname.endsWith('.html')) {
+    const target = url.pathname + '/' + url.search;
+    res.writeHead(301, { Location: target, 'Cache-Control': 'no-cache' }); res.end(); return;
+  }
+  try { streamFile(req, res, file); }
+  catch (err) { console.error(err); send(res, 500, 'Internal server error', 'text/plain; charset=utf-8'); }
+});
+
+server.listen(PORT, HOST, () => console.log(`rihaan.net static server listening on http://${HOST}:${PORT}`));
+
+function shutdown() { server.close(() => process.exit(0)); setTimeout(() => process.exit(0), 3000).unref(); }
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
