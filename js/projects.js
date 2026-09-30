@@ -1,10 +1,19 @@
-/* Rihaan projects page: renders a static gallery of website previews from
-   projects/manifest.json. Each entry points at a folder under ./projects/
-   containing that project's own index.html, served as a sandboxed iframe. */
+/* Rihaan projects page: renders a static gallery of website previews.
+   The list is embedded below (not fetched) so the gallery never depends on
+   a second network request that could fail on some devices/networks.
+   Each entry points at a folder under ./projects/ containing that
+   project's own index.html, served as a sandboxed iframe. */
 (function () {
   'use strict';
 
-  const MANIFEST_URL = './projects/manifest.json';
+  const PROJECTS = [
+    { slug: 'rihaan-landing-page', title: 'Rihaan Landing Page', desc: "This site's landing page — soccer-inspired hero, AI integrations row and the animated wordmark reveal." },
+    { slug: 'tower-defence-2', title: 'Tower Defence 2', desc: 'A browser tower-defense game with escalating waves, built to be tough from the very first level.' },
+    { slug: 'kathleen', title: 'Kathleen Treseder Campaign', desc: 'A student campaign site for Irvine City Council, District 6 — every claim links to a public source.' },
+    { slug: 'mama-recipe-finder', title: 'Recipe Finder', desc: 'Search and discover recipes with an AI Chef assistant, pulling live data from TheMealDB.' },
+    { slug: 'workflow-pipeline', title: 'Brick Route', desc: 'An interactive, LEGO-themed walkthrough of an analysis workflow pipeline.' },
+    { slug: 'lego-brickforge', title: 'BrickForge', desc: '3D LEGO build instructions viewer powered by the Rebrickable API.' }
+  ];
   const PREVIEW_WIDTH = 1280;
 
   const els = {
@@ -103,16 +112,6 @@
     if (els.count) els.count.textContent = n + (n === 1 ? ' website' : ' websites');
   }
 
-  fetch(MANIFEST_URL)
-    .then((res) => { if (!res.ok) throw new Error('Could not load the project list.'); return res.json(); })
-    .then((list) => {
-      const projects = Array.isArray(list) ? list : [];
-      projects.forEach((project) => mountCard(buildCard(project)));
-      updateCount(projects.length);
-      if (!projects.length) setStatus('No projects yet.');
-    })
-    .catch((err) => {
-      updateCount(0);
-      setStatus('Could not load the project list: ' + (err && err.message ? err.message : err), 'error');
-    });
+  PROJECTS.forEach((project) => mountCard(buildCard(project)));
+  updateCount(PROJECTS.length);
 })();

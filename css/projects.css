@@ -120,15 +120,90 @@
 }
 
 /* --------------------------------------------------------------------------
+   Apps: App Store cards
+   -------------------------------------------------------------------------- */
+.apps-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.app-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  animation: project-in .6s var(--ease-reveal) both;
+}
+.app-card__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.app-card__icon {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  object-fit: cover;
+}
+.app-card__body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.app-card__title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 1.15;
+  margin: 0 0 6px;
+  overflow-wrap: anywhere;
+}
+.app-card__meta {
+  margin: 0;
+  font-size: 13px;
+  color: var(--dim);
+  overflow-wrap: anywhere;
+}
+.app-card__shots {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 6px;
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+.app-card__shots li {
+  flex: none;
+  scroll-snap-align: start;
+}
+.app-card__shots img {
+  display: block;
+  height: 220px;
+  width: auto;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #0f0f0f;
+}
+.app-card .btn { align-self: flex-start; margin-top: auto; }
+
+/* --------------------------------------------------------------------------
    Responsive
    -------------------------------------------------------------------------- */
 @media (max-width: 1100px) {
   .projects-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .apps-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 700px) {
   /* minmax(0, 1fr), not 1fr: WebKit otherwise keeps a card's stale
      min-content width after a resize and the grid overflows the viewport. */
   .projects-grid { grid-template-columns: minmax(0, 1fr); }
+  .apps-grid { grid-template-columns: minmax(0, 1fr); }
   .project-card { padding: 10px 10px 20px; }
 }
 @media (prefers-reduced-motion: reduce) {
