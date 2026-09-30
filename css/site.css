@@ -865,6 +865,29 @@ a.card:hover .btn__arrow,
   .burger__line, .scrim, .sheet, .card, .btn, .sheet__ball img { transition: none; }
 }
 
+/* Phones: the inline nav is cramped next to the burger, so hand navigation
+   to the slide-in menu, tighten spacing and keep everything within the viewport. */
+@media (max-width: 640px) {
+  :root { --gutter: 18px; }
+  .site-header { gap: 16px; }
+  .site-nav { display: none; }
+  .burger { margin-left: auto; }
+  .hero { padding-top: 32px; }
+  .hero__title { font-size: clamp(38px, 12vw, 56px); margin: 14px 0 20px; }
+  .hero__lede { font-size: 16px; margin-bottom: 26px; }
+  .hero__ball { width: 150px; margin-top: 28px; }
+  .section { padding-block: 48px; }
+  .section__title { font-size: clamp(28px, 9vw, 40px); }
+  .card { padding: 20px; }
+  .btn { width: 100%; max-width: 100%; box-sizing: border-box; justify-content: center; white-space: normal; text-align: center; }
+  .hero__actions, .cta__actions { flex-direction: column; align-items: stretch; width: 100%; }
+  .site-footer__inner { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .site-footer nav { display: flex; flex-wrap: wrap; gap: 14px 18px; }
+  img, video { max-width: 100%; }
+  table { display: block; overflow-x: auto; }
+  input, select, textarea { font-size: 16px; } /* prevents iOS zoom on focus */
+}
+
 /* Contact layout */
 .contact-grid {
   display: grid;

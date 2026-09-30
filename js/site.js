@@ -65,4 +65,11 @@
     });
   }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
   targets.forEach(function (el) { io.observe(el); });
+  /* Safety net: anything still hidden after 1.5s (observer quirks on some
+     mobile browsers / emulators) is revealed so content is never invisible. */
+  setTimeout(function () {
+    targets.forEach(function (el) {
+      if (!el.classList.contains('is-in')) { el.classList.add('is-in'); io.unobserve(el); }
+    });
+  }, 1500);
 })();

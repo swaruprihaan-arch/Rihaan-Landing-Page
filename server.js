@@ -81,9 +81,67 @@ function resolve(urlPath) {
   return null;
 }
 
+/* ---------------- Contact form -> email (server-side only) ----------------
+   POST /api/contact  {name,email,company,topic,message,page}
+   Relays through Resend's HTTPS API. The key lives only in the RESEND_API_KEY
+   env var on Railway; it is never sent to the browser. Recipient defaults to
+   CONTACT_TO. Sender must be a Resend-verified address (CONTACT_FROM). */
+const CONTACT_TO = process.env.CONTACT_TO || 'swaruprihaan@gmail.com';
+const CONTACT_FROM = process.env.CONTACT_FROM || 'Rihaan Contact <onboarding@resend.dev>';
+const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
+const rateHits = new Map(); /* ip -> [timestamps] : 5 per 10 min */
+
+function tooMany(ip) {
+  const now = Date.now(); const win = 10 * 60 * 1000;
+  const list = (rateHits.get(ip) || []).filter((t) => now - t < win);
+  list.push(now); rateHits.set(ip, list);
+  if (rateHits.size > 5000) rateHits.clear();
+  return list.length > 5;
+}
+function esc(s) { return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+function readJson(req, limit) {
+  return new Promise((resolve, reject) => {
+    let body = ''; let size = 0;
+    req.on('data', (chunk) => { size += chunk.length; if (size > limit) { reject(new Error('too large')); req.destroy(); return; } body += chunk; });
+    req.on('end', () => { try { resolve(JSON.parse(body || '{}')); } catch (e) { reject(new Error('bad json')); } });
+    req.on('error', reject);
+  });
+}
+
+async function handleContact(req, res) {
+  const json = (status, obj) => send(res, status, JSON.stringify(obj), 'application/json; charset=utf-8', { 'Cache-Control': 'no-store' });
+  if (!RESEND_API_KEY) { console.error('contact: RESEND_API_KEY not set'); json(503, { ok: false, error: 'Email is not configured yet.' }); return; }
+  const ip = String(req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+  if (tooMany(ip)) { json(429, { ok: false, error: 'Too many messages. Please try again later.' }); return; }
+  let data;
+  try { data = await readJson(req, 20 * 1024); } catch (e) { json(400, { ok: false, error: 'Invalid request.' }); return; }
+  const name = String(data.name || '').trim().slice(0, 200);
+  const email = String(data.email || '').trim().slice(0, 200);
+  const company = String(data.company || '').trim().slice(0, 200);
+  const topic = String(data.topic || '').trim().slice(0, 100);
+  const message = String(data.message || '').trim().slice(0, 5000);
+  const page = String(data.page || '').trim().slice(0, 500);
+  if (data.website) { json(200, { ok: true }); return; } /* honeypot */
+  if (!name || !message || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { json(400, { ok: false, error: 'Please fill in your name, a valid email and a message.' }); return; }
+
+  const text = `Name: ${name}\nEmail: ${email}\nCompany: ${company || '-'}\nTopic: ${topic || '-'}\nPage: ${page || '-'}\nIP: ${ip || '-'}\n\n${message}`;
+  const html = `<p><b>Name:</b> ${esc(name)}<br><b>Email:</b> <a href="mailto:${esc(email)}">${esc(email)}</a><br><b>Company:</b> ${esc(company || '-')}<br><b>Topic:</b> ${esc(topic || '-')}<br><b>Page:</b> ${esc(page || '-')}</p><pre style="white-space:pre-wrap;font:inherit">${esc(message)}</pre>`;
+  const payload = JSON.stringify({ from: CONTACT_FROM, to: [CONTACT_TO], reply_to: email, subject: `[rihaan.net] ${topic || 'Contact'} from ${name}`, text, html });
+  try {
+    const r = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: 'Bearer ' + RESEND_API_KEY, 'Content-Type': 'application/json' }, body: payload });
+    if (!r.ok) { console.error('contact: resend', r.status, (await r.text()).slice(0, 300)); json(502, { ok: false, error: 'Could not send right now. Please try again shortly.' }); return; }
+    json(200, { ok: true });
+  } catch (err) { console.error('contact:', err.message); json(502, { ok: false, error: 'Could not send right now. Please try again shortly.' }); }
+}
+
 const server = http.createServer((req, res) => {
-  if (req.method !== 'GET' && req.method !== 'HEAD') { send(res, 405, 'Method not allowed', 'text/plain; charset=utf-8', { Allow: 'GET, HEAD' }); return; }
   const url = new URL(req.url, 'http://localhost');
+  if (url.pathname === '/api/contact') {
+    if (req.method === 'POST') { handleContact(req, res); return; }
+    send(res, 405, 'Method not allowed', 'text/plain; charset=utf-8', { Allow: 'POST' }); return;
+  }
+  if (req.method !== 'GET' && req.method !== 'HEAD') { send(res, 405, 'Method not allowed', 'text/plain; charset=utf-8', { Allow: 'GET, HEAD' }); return; }
   if (url.pathname === '/healthz') { send(res, 200, 'ok', 'text/plain; charset=utf-8', { 'Cache-Control': 'no-store' }); return; }
 
   const file = resolve(url.pathname);

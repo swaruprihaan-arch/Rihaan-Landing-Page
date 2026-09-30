@@ -205,6 +205,11 @@
   .projects-grid { grid-template-columns: minmax(0, 1fr); }
   .apps-grid { grid-template-columns: minmax(0, 1fr); }
   .project-card { padding: 10px 10px 20px; }
+  .project-card__title { font-size: 22px; }
+  .app-card { padding: 16px; }
+  .app-card__shots img { height: 190px; }
+  .app-card .btn, .project-card__btn { width: 100%; justify-content: center; text-align: center; }
+  .project-card__actions { flex-direction: column; }
 }
 @media (prefers-reduced-motion: reduce) {
   .project-card { animation: none; }

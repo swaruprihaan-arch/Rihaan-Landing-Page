@@ -148,10 +148,9 @@
   <script>
     (function () {
       'use strict';
-      /* Where submissions go. Leave empty to confirm locally without sending;
-         set it to your form endpoint (for example a Formspree form URL or your
-         own POST handler) and messages are delivered there as JSON. */
-      var FORM_ENDPOINT = '';
+      /* Submissions are POSTed as JSON to the site's own server, which emails
+         them on (see server.js). No third-party keys live in this page. */
+      var FORM_ENDPOINT = '/api/contact';
 
       var form = document.getElementById('contact-form');
       if (!form) return;
@@ -204,11 +203,14 @@
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
           body: JSON.stringify(data)
         }).then(function (r) {
-          if (!r.ok) throw new Error(String(r.status));
+          return r.json().catch(function () { return {}; }).then(function (body) {
+            if (!r.ok || !body.ok) throw new Error(body.error || String(r.status));
+          });
+        }).then(function () {
           status.textContent = '';
           done();
-        }).catch(function () {
-          status.textContent = 'Something went wrong sending that. Please try again in a moment.';
+        }).catch(function (err) {
+          status.textContent = (err && err.message && !/^\d+$/.test(err.message)) ? err.message : 'Something went wrong sending that. Please try again in a moment.';
         }).then(function () {
           button.classList.remove('is-busy');
         });
