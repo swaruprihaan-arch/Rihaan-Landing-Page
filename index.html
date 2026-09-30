@@ -905,6 +905,48 @@
       stage.addEventListener('mousemove', function (e) { hovering = true; toCanvasSpace(e); wake(); });
       stage.addEventListener('mouseleave', function () { hovering = false; lastSample = null; wake(); });
 
+      /* Touch: swipe across the ball to reveal. The trail follows the finger
+         while it is down and fades out on lift. Scrolling is suppressed only
+         while the finger is on the ball itself, so the rest of the page still
+         scrolls normally. A plain tap (no movement) does nothing. */
+      var touchId = null;
+      function touchPoint(e) {
+        for (var i = 0; i < e.changedTouches.length; i++) {
+          if (touchId === null || e.changedTouches[i].identifier === touchId) return e.changedTouches[i];
+        }
+        return null;
+      }
+      function onBall(t) {
+        var r = ball.getBoundingClientRect();
+        return t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom;
+      }
+      /* .ball has pointer-events:none, so listen on the stage and gate by hit-test. */
+      stage.addEventListener('touchstart', function (e) {
+        var t = e.changedTouches[0];
+        if (!t || touchId !== null || !onBall(t)) return;
+        touchId = t.identifier;
+        toCanvasSpace(t);
+        lastSample = { x: mouse.x, y: mouse.y };
+      }, { passive: true });
+      stage.addEventListener('touchmove', function (e) {
+        if (touchId === null) return;
+        var t = touchPoint(e);
+        if (!t) return;
+        e.preventDefault();
+        hovering = true;
+        toCanvasSpace(t);
+        wake();
+      }, { passive: false });
+      function touchEnd(e) {
+        if (touchId === null || !touchPoint(e)) return;
+        touchId = null;
+        hovering = false;
+        lastSample = null;
+        wake();
+      }
+      stage.addEventListener('touchend', touchEnd, { passive: true });
+      stage.addEventListener('touchcancel', touchEnd, { passive: true });
+
       if (typeof ResizeObserver === 'function') {
         new ResizeObserver(syncSize).observe(ball);
       }

@@ -7,7 +7,7 @@
   <meta name="description" content="Send Rihaan a message about what you are building.">
   <title>Contact | Rihaan</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 66 62'%3E%3Crect width='66' height='62' rx='14' fill='%23161616'/%3E%3Cg stroke='%23fff' stroke-width='5' stroke-linecap='square'%3E%3Cline x1='33' y1='6' x2='33' y2='56'/%3E%3Cline x1='8' y1='31' x2='58' y2='31'/%3E%3Cline x1='15.3' y1='13.3' x2='50.7' y2='48.7'/%3E%3Cline x1='50.7' y1='13.3' x2='15.3' y2='48.7'/%3E%3C/g%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./css/site.css?v=be13db3">
+  <link rel="stylesheet" href="./css/site.css?v=82cf4c4">
 </head>
 <body class="page page--contact">
   <a class="skip" href="#main">Skip to content</a>
@@ -95,10 +95,14 @@
               <textarea id="message" name="message" required placeholder="What are you building, and where can we see it?"></textarea>
               <p class="field__error">A sentence or two helps us reply properly.</p>
             </div>
+            <div class="field field--hp" aria-hidden="true">
+              <label for="website">Website</label>
+              <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+            </div>
           </div>
           <div class="form__foot">
             <button class="btn btn--primary" type="submit">Send message <span class="btn__arrow" aria-hidden="true">→</span></button>
-            <p class="form__note">Your details are only used to reply to you.</p>
+            <p class="form__note">Your details are only used to reply to you. Prefer email? <a href="mailto:swaruprihaan@gmail.com">swaruprihaan@gmail.com</a></p>
             <p class="form__status" role="status" aria-live="polite"></p>
           </div>
           <div class="form__success" tabindex="-1">
@@ -118,6 +122,10 @@
               <li><div><h3>Links to it</h3><p>A repository, a live site or a folder of files, whatever exists so far.</p></div></li>
               <li><div><h3>When you need it</h3><p>A date if there is one, or roughly when you would like to start.</p></div></li>
             </ol>
+          </div>
+          <div class="aside__block">
+            <h2 class="aside__title">Direct</h2>
+            <p class="aside__body"><a href="mailto:swaruprihaan@gmail.com">swaruprihaan@gmail.com</a><br><a href="https://github.com/swaruprihaan-arch" target="_blank" rel="noopener">github.com/swaruprihaan-arch</a></p>
           </div>
         </aside>
       </div>
@@ -144,7 +152,7 @@
     </div>
   </footer>
 
-  <script src="./js/site.js?v=be13db3"></script>
+  <script src="./js/site.js?v=82cf4c4"></script>
   <script>
     (function () {
       'use strict';
@@ -187,6 +195,7 @@
           company: form.company.value.trim(),
           topic: form.topic.value,
           message: form.message.value.trim(),
+          website: form.website ? form.website.value : '',
           page: window.location.href
         };
         function done() {

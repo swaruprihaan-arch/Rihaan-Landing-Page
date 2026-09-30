@@ -7,12 +7,12 @@
   'use strict';
 
   const PROJECTS = [
-    { slug: 'rihaan-landing-page', title: 'Rihaan Landing Page', desc: "This site's landing page — soccer-inspired hero, AI integrations row and the animated wordmark reveal." },
+    { slug: 'rihaan-landing-page', title: 'Rihaan Landing Page', desc: "This site's landing page — soccer-inspired hero, AI integrations row and the animated wordmark reveal.", repo: 'https://github.com/swaruprihaan-arch/Rihaan-Landing-Page' },
     { slug: 'tower-defence-2', title: 'Tower Defence 2', desc: 'A browser tower-defense game with escalating waves, built to be tough from the very first level.' },
-    { slug: 'kathleen', title: 'Kathleen Treseder Campaign', desc: 'A student campaign site for Irvine City Council, District 6 — every claim links to a public source.' },
-    { slug: 'mama-recipe-finder', title: 'Recipe Finder', desc: 'Search and discover recipes with an AI Chef assistant, pulling live data from TheMealDB.' },
+    { slug: 'kathleen', title: 'Kathleen Treseder Campaign', desc: 'A student campaign site for Irvine City Council, District 6 — every claim links to a public source.', repo: 'https://github.com/swaruprihaan-arch/Kathleen_BioGlow' },
+    { slug: 'mama-recipe-finder', title: 'Recipe Finder', desc: 'Search and discover recipes with an AI Chef assistant, pulling live data from TheMealDB.', repo: 'https://github.com/swaruprihaan-arch/Recipe-Finder' },
     { slug: 'workflow-pipeline', title: 'Brick Route', desc: 'An interactive, LEGO-themed walkthrough of an analysis workflow pipeline.' },
-    { slug: 'lego-brickforge', title: 'BrickForge', desc: '3D LEGO build instructions viewer powered by the Rebrickable API.' }
+    { slug: 'lego-brickforge', title: 'BrickForge', desc: '3D LEGO build instructions viewer powered by the Rebrickable API.', repo: 'https://github.com/swaruprihaan-arch/Lego_Bricks' }
   ];
   const PREVIEW_WIDTH = 1280;
 
@@ -51,6 +51,19 @@
     if (!win) setStatus('The new tab may have been blocked. Allow pop-ups for this page and try again.', 'error');
   }
 
+  /* Previews only start loading when the card is near the viewport: six live
+     sites at once is too heavy for phones. */
+  const loadObserver = typeof IntersectionObserver === 'function'
+    ? new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const frame = entry.target.querySelector('.project-card__frame');
+          if (frame && !frame.src) frame.src = frame.getAttribute('data-src');
+          loadObserver.unobserve(entry.target);
+        });
+      }, { rootMargin: '300px 0px' })
+    : null;
+
   function buildCard(project) {
     const url = './projects/' + project.slug + '/index.html';
     const li = document.createElement('li');
@@ -69,9 +82,14 @@
        until it has loaded (with a fallback in case load never fires). */
     const reveal = () => frame.classList.add('is-loaded');
     frame.addEventListener('load', reveal);
-    setTimeout(reveal, 12000);
-    frame.src = url;
+    setTimeout(reveal, 15000);
+    frame.setAttribute('data-src', url);
+    if (!loadObserver) frame.src = url;
     preview.appendChild(frame);
+    const badge = document.createElement('span');
+    badge.className = 'project-card__badge';
+    badge.textContent = 'Live preview';
+    preview.appendChild(badge);
     preview.addEventListener('click', () => openProject(url));
 
     const body = document.createElement('div');
@@ -84,12 +102,22 @@
     meta.textContent = project.desc || '';
     const actions = document.createElement('div');
     actions.className = 'project-card__actions';
-    const openBtn = document.createElement('button');
-    openBtn.type = 'button';
+    const openBtn = document.createElement('a');
     openBtn.className = 'project-card__btn project-card__btn--primary';
-    openBtn.textContent = 'Open';
-    openBtn.addEventListener('click', () => openProject(url));
+    openBtn.textContent = 'Open site';
+    openBtn.href = url;
+    openBtn.target = '_blank';
+    openBtn.rel = 'noopener';
     actions.appendChild(openBtn);
+    if (project.repo) {
+      const repoBtn = document.createElement('a');
+      repoBtn.className = 'project-card__btn';
+      repoBtn.textContent = 'Source';
+      repoBtn.href = project.repo;
+      repoBtn.target = '_blank';
+      repoBtn.rel = 'noopener';
+      actions.appendChild(repoBtn);
+    }
     body.appendChild(title);
     body.appendChild(meta);
     body.appendChild(actions);
@@ -105,6 +133,7 @@
     if (preview) {
       fitFrame(preview);
       if (frameObserver) frameObserver.observe(preview);
+      if (loadObserver) loadObserver.observe(preview);
     }
   }
 
