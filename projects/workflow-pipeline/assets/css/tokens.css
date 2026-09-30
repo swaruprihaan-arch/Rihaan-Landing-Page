@@ -1,0 +1,67 @@
+/* Brick Route · design tokens
+   Color families (red, orange, yellow, green, teal, mint, blue, purple, pink,
+   brown, black, white) each have ten shades, --<family>-0 (lightest) to
+   --<family>-9 (darkest). They are generated once at load by palette.js and
+   written onto :root, so CSS and JS always agree. The values below are the
+   non-generated tokens. */
+
+:root {
+  color-scheme: light;
+
+  /* ground */
+  --bg: #EEF1EA;
+  --card: #FFFFFF;
+  --line: #D9DED3;
+  --ink: #1B1D1F;
+  --ink-2: #5E656B;
+  --ink-3: #8B9298;
+
+  /* baseplate */
+  --plate: #6FA85E;
+  --plate-stud: #7FB56E;
+  --plate-shadow: rgba(0, 0, 0, .18);
+
+  /* semantic (status) — never used as decoration */
+  --ok: #237841;
+  --ok-soft: #DDF1E1;
+  --warn: #B87A00;
+  --warn-soft: #FFF3CD;
+  --bad: #D01012;
+  --bad-soft: #FBE1E1;
+  --neutral-soft: #EEF1EA;
+
+  /* type */
+  --display: "Fredoka", "Nunito", system-ui, sans-serif;
+  --body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "DM Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* rhythm */
+  --stud: 28px;           /* one LEGO stud */
+  --r: 6px;               /* brick corner */
+  --header-h: 62px;
+  --gutter: 16px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html, body { height: 100%; margin: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.45 var(--body);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  user-select: none;
+}
+
+h1, h2, h3 { font-family: var(--display); margin: 0; }
+code, kbd, .mono { font-family: var(--mono); }
+kbd { font-size: 11px; padding: 1px 6px; border-radius: 4px; background: #fff; border: 1px solid var(--line); color: var(--ink-2); }
+button { font: inherit; color: inherit; }
+button:focus-visible, [tabindex]:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

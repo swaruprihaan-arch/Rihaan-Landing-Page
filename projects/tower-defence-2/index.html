@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Tower Defence</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header id="topbar">
+      <div class="brand">⚔️ Tower Defence</div>
+      <div class="stats">
+        <div class="stat" id="stat-gold" title="Galleons — spend them on towers and upgrades">💰 <span id="gold">200</span></div>
+        <div class="stat" id="stat-lives" title="Lives — reach 0 and it's game over">❤️ <span id="lives">15</span></div>
+        <div class="stat" id="stat-wave" title="Current wave / total waves">🌊 Wave <span id="wave">0</span>/<span id="waveTotal">100</span></div>
+        <div class="stat" id="stat-score">⭐ <span id="score">0</span></div>
+        <div class="stat" id="stat-best" title="Best score this browser">🏆 Best <span id="best">0</span></div>
+      </div>
+      <div class="controls">
+        <button id="startWaveBtn" title="Start the next wave (Enter)">▶ Start Wave</button>
+        <button id="speedBtn" title="Cycle simulation speed (S)">Speed: 1x</button>
+        <button id="pauseBtn" title="Pause / resume (Space)">⏸ Pause</button>
+        <button id="muteBtn" title="Mute / unmute sound (M)">🔊</button>
+        <button id="helpBtn" title="How to play (H)">❓ Help</button>
+        <button id="restartBtn" title="Restart the game">↺ Restart</button>
+      </div>
+    </header>
+
+    <div id="next-wave-bar">
+      <span class="nw-label">Next wave preview:</span>
+      <span id="next-wave-preview">—</span>
+      <span id="auto-wave-wrap"><label><input type="checkbox" id="autoWaveChk"> Auto-start waves</label></span>
+    </div>
+
+    <main id="game-area">
+      <aside id="tower-shop">
+        <div id="shop-controls">
+          <input type="text" id="towerSearch" placeholder="🔍 Search towers…">
+          <div class="category-tabs">
+            <button class="cat-tab active" data-cat="all">All</button>
+            <button class="cat-tab" data-cat="basic">Basic</button>
+            <button class="cat-tab" data-cat="elemental">Elemental</button>
+            <button class="cat-tab" data-cat="mechanical">Mechanical</button>
+            <button class="cat-tab" data-cat="halo">Halo</button>
+            <button class="cat-tab" data-cat="weapon">Weapons</button>
+            <button class="cat-tab" data-cat="vehicle">Vehicles</button>
+          </div>
+          <div class="hint">Click a card (or 1-4 for basics), then click the grid.</div>
+        </div>
+        <div id="tower-list"></div>
+
+        <button id="cancelPlaceBtn" class="hidden">✕ Cancel Placement (Esc)</button>
+
+        <div id="selected-panel" class="hidden">
+          <h3>Selected Tower</h3>
+          <div id="selected-info"></div>
+          <button id="upgradeBtn">⬆ Upgrade (💰<span id="upgradeCost"></span>)</button>
+          <button id="moveBtn">↔ Move Tower</button>
+          <button id="sellBtn">💵 Sell (💰<span id="sellValue"></span>)</button>
+        </div>
+
+        <div id="pets-panel">
+          <h3>Pets <span class="hint">(guard the base, some heal)</span></h3>
+          <div id="pets-list"></div>
+          <div id="owned-pets"></div>
+        </div>
+
+        <div id="log-panel">
+          <h3>Log</h3>
+          <div id="log"></div>
+        </div>
+      </aside>
+
+      <div id="canvas-wrap">
+        <canvas id="game" width="800" height="600"></canvas>
+        <div id="toast-wrap"></div>
+        <div id="overlay" class="hidden">
+          <div id="overlay-box">
+            <h2 id="overlay-title">Game Over</h2>
+            <p id="overlay-text"></p>
+            <button id="overlay-btn">↺ Restart</button>
+          </div>
+        </div>
+        <div id="help-overlay" class="hidden">
+          <div id="help-box">
+            <h2>How to Play</h2>
+            <ul>
+              <li>Click a tower card (or press 1-4 for the basic towers), then click an empty grid cell to build it.</li>
+              <li>Towers auto-fire at enemies within range, prioritizing whoever is furthest along the path.</li>
+              <li>Click a placed tower to select it — upgrade for a huge range boost plus more damage, or sell for a refund.</li>
+              <li>Click "Start Wave" (or Enter) to send the next wave. Enemies that reach the end cost you a life.</li>
+              <li>Browse 224 tower types across Basic, Elemental, Mechanical, Halo, Weapons and Vehicles — search or filter with the tabs.</li>
+              <li>Adopt Pets to guard your base — they fight enemies that get close, and some heal your lives over time.</li>
+              <li>Survive all 100 waves to win. The game gets harder every wave. Lose all lives and it's game over.</li>
+            </ul>
+            <h3>Keyboard shortcuts</h3>
+            <div class="key-grid">
+              <div><kbd>1</kbd>-<kbd>4</kbd> select basic tower</div>
+              <div><kbd>Esc</kbd> cancel placement</div>
+              <div><kbd>Enter</kbd> start wave</div>
+              <div><kbd>Space</kbd> pause/resume</div>
+              <div><kbd>S</kbd> cycle speed</div>
+              <div><kbd>M</kbd> mute/unmute</div>
+              <div><kbd>H</kbd> toggle help</div>
+              <div><kbd>Delete</kbd> sell selected tower</div>
+            </div>
+            <button id="closeHelpBtn">Got it</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+<script src="app.js"></script>
+</body>
+</html>

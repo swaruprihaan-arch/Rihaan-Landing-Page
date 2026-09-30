@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recipe Finder</title>
+<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="apiKeyBanner" class="api-key-banner hidden">
+  <span id="apiKeyBannerText">⚠️ No Claude API key set — AI Chef won't work until you add one.</span>
+  <button id="apiKeyBannerBtn">Add API Key</button>
+  <button id="apiKeyBannerDismiss" class="api-key-banner-dismiss" title="Dismiss">✕</button>
+</div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">🍳 Recipe<span>Finder</span></div>
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="discover">Discover</button>
+      <button class="tab-btn" data-tab="aichef">🤖 AI Chef</button>
+      <button class="tab-btn" data-tab="community">🌐 Community</button>
+      <button class="tab-btn" data-tab="favorites">Favorites <span id="favCount" class="fav-badge hidden">0</span></button>
+      <button class="tab-btn" data-tab="settings">⚙ Settings</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- DISCOVER TAB -->
+  <section id="tab-discover" class="tab-panel active">
+    <p class="tagline">Find your next favorite meal</p>
+
+    <section class="search-panel">
+      <div class="search-row">
+        <input type="text" id="searchInput" placeholder="Search by recipe name (e.g. pasta, chicken curry)...">
+        <button id="searchBtn">Search</button>
+      </div>
+
+      <div class="filters">
+        <div class="filter-group">
+          <label for="categoryFilter">Meal Category</label>
+          <select id="categoryFilter">
+            <option value="">All Categories</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="areaFilter">Cuisine / Area</label>
+          <select id="areaFilter">
+            <option value="">All Cuisines</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="ingredientFilter">Main Ingredient</label>
+          <select id="ingredientFilter">
+            <option value="">Any Ingredient</option>
+          </select>
+        </div>
+
+        <button id="clearBtn" class="clear-btn">Clear Filters</button>
+      </div>
+    </section>
+
+    <section class="status-bar">
+      <span id="resultCount"></span>
+      <div class="view-toggle" id="viewToggle">
+        <button data-view="grid" class="view-btn active" title="Grid view">▦</button>
+        <button data-view="list" class="view-btn" title="List view">☰</button>
+      </div>
+    </section>
+
+    <section id="results" class="results-grid"></section>
+
+    <div id="loader" class="skeleton-grid hidden"></div>
+    <div id="emptyState" class="empty-state hidden">
+      <div class="empty-icon">🍽️</div>
+      No recipes found. Try different filters.
+    </div>
+  </section>
+
+  <!-- AI CHEF TAB -->
+  <section id="tab-aichef" class="tab-panel">
+    <p class="tagline">Tell the AI Chef what you've got — ingredients, seasonings, meal type, anything</p>
+
+    <section class="search-panel ai-chef-panel">
+      <textarea id="aiChefInput" rows="4" placeholder="e.g. I have salt and pepper as the seasonings and I want to make a breakfast meal using these as the seasonings for a potato"></textarea>
+      <div class="ai-chef-row">
+        <button id="aiChefBtn">✨ Find or Create My Recipe</button>
+        <span id="aiChefStatus" class="ai-chef-status"></span>
+      </div>
+      <div id="aiChefNoKey" class="ai-chef-notice hidden">
+        No Claude API key set yet. <button id="aiChefGoSettings" class="link-btn">Add it in Settings</button> to use AI Chef.
+      </div>
+    </section>
+
+    <div id="aiChefLoader" class="skeleton-grid hidden"></div>
+
+    <section id="aiChefResults" class="ai-chef-results"></section>
+  </section>
+
+  <!-- FAVORITES TAB -->
+  <section id="tab-favorites" class="tab-panel">
+    <p class="tagline">Your saved recipes</p>
+    <section id="favoritesResults" class="results-grid"></section>
+    <div id="favEmptyState" class="empty-state hidden">
+      <div class="empty-icon">💔</div>
+      No favorites yet. Tap the heart on any recipe to save it here.
+    </div>
+  </section>
+
+  <!-- COMMUNITY TAB -->
+  <section id="tab-community" class="tab-panel">
+    <p class="tagline">AI Chef recipes made by everyone on this device — publicly browsable</p>
+    <section id="communityResults" class="ai-chef-results"></section>
+    <div id="communityEmptyState" class="empty-state hidden">
+      <div class="empty-icon">🌐</div>
+      No community recipes yet. Ask AI Chef for one to add it here.
+    </div>
+  </section>
+
+
+  <!-- SETTINGS TAB -->
+  <section id="tab-settings" class="tab-panel">
+    <p class="tagline">Customize your experience</p>
+
+    <div class="settings-panel">
+
+      <div class="settings-group">
+        <h3>Appearance</h3>
+
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Theme</div>
+            <div class="setting-desc">Choose light, dark, or match your system</div>
+          </div>
+          <div class="segmented" id="themeSegmented">
+            <button data-value="light" class="seg-btn">☀️ Light</button>
+            <button data-value="dark" class="seg-btn">🌙 Dark</button>
+            <button data-value="auto" class="seg-btn">🖥️ Auto</button>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Accent Color</div>
+            <div class="setting-desc">Pick the highlight color for buttons and tags</div>
+          </div>
+          <div class="swatches" id="accentSwatches">
+            <button class="swatch" data-color="#ff6b35" style="background:#ff6b35"></button>
+            <button class="swatch" data-color="#2ea043" style="background:#2ea043"></button>
+            <button class="swatch" data-color="#2565c7" style="background:#2565c7"></button>
+            <button class="swatch" data-color="#d7263d" style="background:#d7263d"></button>
+            <button class="swatch" data-color="#8e44ad" style="background:#8e44ad"></button>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Default Results View</div>
+            <div class="setting-desc">Grid cards or compact list</div>
+          </div>
+          <div class="segmented" id="viewSegmented">
+            <button data-value="grid" class="seg-btn">▦ Grid</button>
+            <button data-value="list" class="seg-btn">☰ List</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <h3>Search Behavior</h3>
+
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Default Cuisine</div>
+            <div class="setting-desc">Automatically applied when you open the app</div>
+          </div>
+          <select id="defaultAreaSetting" class="settings-select">
+            <option value="">None</option>
+          </select>
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Default Category</div>
+            <div class="setting-desc">Automatically applied when you open the app</div>
+          </div>
+          <select id="defaultCategorySetting" class="settings-select">
+            <option value="">None</option>
+          </select>
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Live Search</div>
+            <div class="setting-desc">Search automatically while typing (debounced)</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="liveSearchToggle" checked>
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <h3>AI Chef</h3>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Claude API Key</div>
+            <div class="setting-desc">Stored only in this browser (localStorage). Sent directly to Anthropic's API — never to any other server.</div>
+          </div>
+          <div class="api-key-input-wrap">
+            <input type="password" id="claudeApiKeyInput" class="settings-select" placeholder="sk-ant-...">
+            <button id="saveApiKeyBtn" class="tiny-btn">Save</button>
+            <button id="clearApiKeyBtn" class="tiny-btn danger-btn">Clear</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Key status</div>
+            <div class="setting-desc" id="apiKeyStatus">No key saved</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <h3>Data</h3>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Favorites saved</div>
+            <div class="setting-desc" id="favSummary">0 recipes saved locally</div>
+          </div>
+          <button id="clearFavsBtn" class="danger-btn">Clear Favorites</button>
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Reset all settings</div>
+            <div class="setting-desc">Restore theme, accent, and defaults to factory settings</div>
+          </div>
+          <button id="resetSettingsBtn" class="danger-btn">Reset Settings</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- RECIPE DETAIL (full screen) -->
+  <section id="tab-detail" class="tab-panel detail-panel">
+    <div class="detail-topbar">
+      <button id="detailBackBtn" class="back-btn">&larr; Back to results</button>
+      <button id="detailFavBtn" class="detail-fav-btn">♡ Save</button>
+    </div>
+    <div id="detailContent"></div>
+  </section>
+
+</main>
+
+<div id="toast" class="toast hidden"></div>
+
+<footer>
+  <p>Powered by <a href="https://www.themealdb.com/api.php" target="_blank">TheMealDB</a></p>
+</footer>
+
+<script src="app.js?v=2"></script>
+</body>
+</html>

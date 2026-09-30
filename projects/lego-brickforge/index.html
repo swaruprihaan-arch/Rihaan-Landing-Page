@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="yellow">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bricks A'Hoy — Official LEGO Instructions</title>
+<link rel="stylesheet" href="style.css?v=16">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+</head>
+<body>
+
+<div id="splash">
+  <div class="splash-brick">
+    <span></span><span></span><span></span><span></span>
+  </div>
+  <h1>Bricks A'Hoy</h1>
+  <p>Official building instructions, page by page</p>
+</div>
+
+<nav id="topnav">
+  <div class="brand"><span class="logo-brick"></span> Bricks A'Hoy</div>
+  <div class="tabs">
+    <button class="tab active" data-tab="home">Home</button>
+    <button class="tab" data-tab="build">Build</button>
+    <button class="tab" data-tab="collab">Collab</button>
+    <button class="tab" data-tab="settings">Settings</button>
+  </div>
+  <div class="nav-right">
+    <span id="room-badge" class="room-badge hidden"></span>
+    <button id="sound-toggle" class="icon-btn" title="Toggle sound">🔊</button>
+  </div>
+</nav>
+
+<main>
+  <!-- HOME -->
+  <section id="tab-home" class="tab-panel active">
+    <div class="hero">
+      <div class="hero-text">
+        <h2>Type a set number. <span class="accent">Build it from the official instructions.</span></h2>
+        <p>The real LEGO® booklets from LEGO.com, one page at a time — solo or with up to 10 builders in sync.</p>
+        <form id="search-form" class="search">
+          <input id="search-input" type="text" placeholder="e.g. 42171 (Mercedes-AMG F1 W14)" autocomplete="off" inputmode="numeric">
+          <button type="submit" class="btn primary">Build</button>
+        </form>
+        <div class="quick-picks">
+          <span>Try:</span>
+          <button class="chip" data-set="42171">42171 Mercedes-AMG F1 W14</button>
+          <button class="chip" data-set="42143">42143 Ferrari Daytona</button>
+          <button class="chip" data-set="31215">31215 Sunflowers</button>
+          <button class="chip" data-set="10300">10300 DeLorean</button>
+          <button class="chip" data-set="75192">75192 Millennium Falcon</button>
+        </div>
+      </div>
+      <div class="hero-3d"><canvas id="hero-canvas"></canvas></div>
+    </div>
+
+    <div class="featured" id="featured">
+      <img id="feat-img" alt="">
+      <div class="feat-body">
+        <div class="tag">Featured build</div>
+        <h3 id="feat-name"></h3>
+        <p id="feat-sub" class="muted"></p>
+        <div class="row-btns">
+          <button class="btn primary" id="btn-featured">Build it →</button>
+          <a class="btn ghost" id="feat-lego" href="#" target="_blank" rel="noopener">Official page ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat"><b id="stat-sets">0</b><span>Sets owned</span></div>
+      <div class="stat"><b id="stat-pieces">0</b><span>Pieces</span></div>
+      <div class="stat"><b id="stat-built">0</b><span>Completed</span></div>
+      <div class="stat"><b id="stat-hours">0</b><span>Build time</span></div>
+    </div>
+
+    <div class="section-head">
+      <h3>My Collection</h3>
+      <div class="seg" id="coll-filter">
+        <button class="active" data-f="all">All</button>
+        <button data-f="building">In progress</button>
+        <button data-f="done">Completed</button>
+        <button data-f="wish">Wishlist</button>
+      </div>
+    </div>
+    <div id="collection" class="grid"></div>
+    <div id="collection-empty" class="empty">
+      <div class="empty-brick"></div>
+      <p>Your shelf is empty. Search a set above to start building — or add one to your wishlist.</p>
+    </div>
+  </section>
+
+  <!-- BUILD -->
+  <section id="tab-build" class="tab-panel">
+    <div id="build-empty" class="empty tall">
+      <div class="empty-brick"></div>
+      <p>No set loaded. Go Home and enter a set number.</p>
+    </div>
+    <div id="build-ui" class="hidden">
+      <header class="build-head">
+        <img id="set-img" alt="" class="set-thumb">
+        <div class="set-meta">
+          <div class="set-num" id="set-num"></div>
+          <h2 id="set-name"></h2>
+          <div class="set-sub" id="set-sub"></div>
+        </div>
+        <div class="build-actions">
+          <div class="role-switch hidden" id="mode-switch"><button data-mode="3d" class="active">🧊 3D build</button><button data-mode="pages">📖 Booklet</button></div>
+          <div class="role-switch hidden" id="role-switch"><button data-role="build" class="active">🧱 Build</button><button data-role="parts">🔍 Find pieces</button></div>
+          <button id="btn-collect" class="btn ghost">＋ Add to collection</button>
+          <button id="btn-wish" class="btn ghost">♡ Wishlist</button>
+          <button id="btn-share-room" class="btn ghost">👥 Build together</button>
+          <a id="lnk-lego" class="btn ghost" href="#" target="_blank" rel="noopener">LEGO.com ↗</a>
+        </div>
+      </header>
+
+      <div id="parts-view" class="hidden">
+        <div class="pv-head"><div><div class="muted small">Pieces in</div><h2 id="pv-name"></h2></div><span class="pill" id="pv-count"></span></div>
+        <div id="pv-phase" class="pv-phase hidden"><span class="ph active" data-ph="sort">1 · Sort all the pieces</span><span class="ph" data-ph="give">2 · Get &amp; give pieces to the builder</span></div>
+        <p id="pv-intro" class="muted small">Sort the pieces by colour and tap each kind once it's in its pile.</p>
+        <div id="pv-ahead" class="pv-ahead hidden"><span class="muted small">Look ahead</span><div class="seg"><button data-n="1">1 step</button><button data-n="2" class="active">2 steps</button><button data-n="3">3 steps</button></div></div>
+        <p id="pv-msg" class="hint hidden"></p>
+        <div class="pv-grid" id="pv-grid"></div>
+        <div class="pv-next"><button class="btn primary" id="pv-ready">All pieces sorted ✓</button></div>
+      </div>
+
+      <div class="viewer-wrap">
+        <div class="viewer" id="viewer">
+          <div id="page-box" class="page-box"><div id="page-wrap" class="page-wrap"><canvas id="page-canvas"></canvas></div></div>
+          <canvas id="model-canvas" class="hidden"></canvas>
+
+          <div id="model-loading" class="pdf-overlay hidden">
+            <img id="ml-cover" alt="">
+            <div class="pl-text"><b id="ml-title">Loading the 3D model…</b><span id="ml-sub" class="muted small"></span></div>
+            <div class="pl-bar"><i id="ml-bar"></i></div>
+          </div>
+
+          <div id="pdf-loading" class="pdf-overlay hidden">
+            <img id="pl-cover" alt="">
+            <div class="pl-text"><b id="pl-title">Loading booklet…</b><span id="pl-sub" class="muted small"></span></div>
+            <div class="pl-bar"><i id="pl-bar"></i></div>
+            <a id="pl-open" class="btn ghost small" href="#" target="_blank" rel="noopener">Open the PDF in a new tab instead ↗</a>
+          </div>
+
+          <div id="pdf-fallback" class="pdf-overlay hidden">
+            <img id="pf-cover" alt="">
+            <div class="pl-text"><b id="pf-title"></b><span id="pf-sub" class="muted small"></span></div>
+            <div class="row-btns"><a id="pf-open" class="btn primary" href="#" target="_blank" rel="noopener">Open booklet (PDF) ↗</a><a id="pf-lego" class="btn ghost" href="#" target="_blank" rel="noopener">View on LEGO.com ↗</a></div>
+            <p class="hint" id="pf-hint"></p>
+          </div>
+
+          <div id="bag-flash" class="hidden"></div>
+          <div class="viewer-hud">
+            <div class="hud-left">
+              <span class="step-pill"><span id="hud-label">Page</span> <b id="hud-step">1</b> / <span id="hud-total">1</span></span>
+              <span id="hud-assign" class="assign-pill hidden"></span>
+            </div>
+            <div class="hud-right">
+              <button class="icon-btn" id="btn-fit" title="Fit page to screen">⤢</button>
+              <button class="icon-btn" id="btn-fullscreen" title="Fullscreen">⛶</button>
+            </div>
+          </div>
+          <div class="zoom-ctl"><button class="icon-btn" id="btn-zoom-in" title="Zoom in">+</button><button class="icon-btn" id="btn-zoom-out" title="Zoom out">−</button></div>
+          <div class="progress"><div id="progress-bar"></div></div>
+          <div id="step-complete-flash"></div>
+        </div>
+
+        <aside class="step-panel">
+          <div id="step-parts-box" class="hidden">
+            <div class="panel-head"><h3>This step</h3><span id="step-parts-pill" class="pill"></span></div>
+            <div id="step-parts" class="step-parts"></div>
+          </div>
+          <div class="panel-head">
+            <h3>Booklets</h3>
+            <span id="booklet-pill" class="pill"></span>
+          </div>
+          <div id="booklets" class="booklets"></div>
+          <div class="panel-head"><h3>Progress</h3><span id="step-count-pill" class="pill"></span></div>
+          <div id="step-list" class="step-list"></div>
+          <div id="model-credit" class="source-box muted small hidden"></div>
+          <div class="source-box muted small">Instructions © The LEGO Group, served straight from LEGO.com. LEGO® is a trademark of the LEGO Group, which does not sponsor or endorse this site.</div>
+        </aside>
+      </div>
+
+      <div class="controls">
+        <button id="btn-first" class="ctl" title="First page">⏮</button>
+        <button id="btn-prev" class="ctl" title="Previous page">◀</button>
+        <button id="btn-play" class="ctl big" title="Auto-turn pages">▶</button>
+        <button id="btn-next" class="ctl" title="Next page">▶</button>
+        <button id="btn-last" class="ctl" title="Last page">⏭</button>
+        <input id="step-slider" type="range" min="1" max="1" value="1">
+        <label class="speed" title="Seconds per page when auto-turning">Auto <input id="speed" type="range" min="2" max="15" step="1" value="6"> <span id="speed-label">6s</span></label>
+        <button id="btn-done-step" class="btn primary small">✓ Done</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- COLLAB -->
+  <section id="tab-collab" class="tab-panel">
+    <div class="collab-grid">
+      <div class="card">
+        <h3>Start a room</h3>
+        <p class="muted">Build with up to 10 people. Share the code; they join from any device.</p>
+        <label>Mode</label>
+        <div class="mode-list" id="mode-list">
+          <label class="mode"><input type="radio" name="mode" value="together" checked><div><b>Together</b><span>Everyone sees the same page, in sync. Anyone can turn it.</span></div></label>
+          <label class="mode"><input type="radio" name="mode" value="divided"><div><b>Divided</b><span>Pages are split between builders. Progress merges live.</span></div></label>
+          <label class="mode"><input type="radio" name="mode" value="race"><div><b>Race</b><span>Everyone builds the full set. First to the last page wins.</span></div></label>
+          <label class="mode"><input type="radio" name="mode" value="hotseat"><div><b>Same device</b><span>Pass-and-play: builders take turns on this screen.</span></div></label>
+        </div>
+        <label>Max builders <span id="max-label">10</span></label>
+        <input id="max-builders" type="range" min="2" max="10" value="10">
+        <button id="btn-host" class="btn primary">Create room</button>
+      </div>
+      <div class="card">
+        <h3>Join a room</h3>
+        <p class="muted">Enter the 6-letter code from the host.</p>
+        <div class="join-row">
+          <input id="join-code" type="text" maxlength="6" placeholder="ABC123" autocapitalize="characters">
+          <button id="btn-join" class="btn primary">Join</button>
+        </div>
+        <div class="hint">Same-device mode needs no code — just create a room and add names.</div>
+      </div>
+      <div class="card room-card hidden" id="room-card">
+        <div class="room-head">
+          <div><div class="muted small">Room code</div><div class="code" id="room-code">——————</div></div>
+          <button id="btn-copy-code" class="btn ghost small">Copy</button>
+          <button id="btn-leave" class="btn danger small">Leave</button>
+        </div>
+        <div class="muted" id="room-mode-label"></div>
+        <div class="section-head"><h3>Builders <span id="peer-count" class="pill"></span></h3></div>
+        <div id="peer-list" class="peer-list"></div>
+        <div id="job-hint" class="hint hidden"></div>
+        <div id="hotseat-add" class="join-row hidden">
+          <input id="hotseat-name" placeholder="Builder name">
+          <button id="btn-hotseat-add" class="btn ghost">Add</button>
+        </div>
+        <div id="race-board" class="hidden">
+          <div class="section-head"><h3>Leaderboard</h3></div>
+          <div id="race-list"></div>
+        </div>
+        <button id="btn-goto-build" class="btn primary">Open build →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="tab-settings" class="tab-panel">
+    <div class="settings-grid">
+      <div class="card">
+        <h3>Profile</h3>
+        <label>Display name</label>
+        <input id="s-name" type="text" maxlength="20">
+        <label>Avatar color</label>
+        <div class="swatches" id="avatar-swatches"></div>
+      </div>
+      <div class="card">
+        <h3>Appearance</h3>
+        <label>Theme</label>
+        <div class="seg" id="theme-seg" style="flex-wrap:wrap"><button data-v="yellow">Yellow</button><button data-v="red">Red</button><button data-v="blue">Blue</button><button data-v="light">White</button><button data-v="dark">Dark</button><button data-v="auto">Auto</button></div>
+        <label>Accent</label>
+        <div class="swatches" id="accent-swatches"></div>
+        <label class="row"><span>Reduce motion</span><input type="checkbox" id="s-reduce"></label>
+      </div>
+      <div class="card">
+        <h3>Sound</h3>
+        <label class="row"><span>Sound effects</span><input type="checkbox" id="s-sound" checked></label>
+        <label>Volume <span id="vol-label">70%</span></label>
+        <input id="s-volume" type="range" min="0" max="100" value="70">
+        <button id="btn-test-sound" class="btn ghost small">Test</button>
+      </div>
+      <div class="card">
+        <h3>Build</h3>
+        <label>Auto-turn: seconds per page <span id="autosecs-label">6s</span></label>
+        <input id="s-autosecs" type="range" min="2" max="15" step="1" value="6">
+        <label class="row"><span>Turn the page after "Done"</span><input type="checkbox" id="s-autoadv" checked></label>
+        <div class="hint">Instructions come from LEGO.com. Booklets you open are kept on this device so they load instantly next time.</div>
+      </div>
+      <div class="card">
+        <h3>Data sources</h3>
+        <label>Rebrickable API key (optional) <a href="https://rebrickable.com/api/" target="_blank" rel="noopener">get free key</a></label>
+        <div class="join-row"><input id="s-rb-key" type="password" placeholder="Paste key"><button id="btn-save-rb" class="btn ghost small">Save</button></div>
+        <div class="hint" id="rb-status">No key — the "Find pieces" helper won't show a piece list. Instructions work without it.</div>
+        <label>Instructions proxy URL (optional, hosted sites only)</label>
+        <div class="join-row"><input id="s-proxy" type="text" placeholder="https://your-worker.workers.dev"><button id="btn-save-proxy" class="btn ghost small">Save</button></div>
+        <div class="hint" id="proxy-status">Only needed when the site is hosted on another domain — see README for the 2-minute Cloudflare Worker.</div>
+        <div class="warn small">⚠ Keys stay in this browser only. Never commit keys to a public repo.</div>
+      </div>
+      <div class="card">
+        <h3>Danger zone</h3>
+        <button id="btn-clear-cache" class="btn ghost">Clear cached sets &amp; booklets</button>
+        <button id="btn-reset" class="btn danger">Reset everything</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="reveal" class="hidden"></div>
+<div id="toasts"></div>
+<div id="modal" class="modal hidden"><div class="modal-box" id="modal-box"></div></div>
+
+<script src="sets.js?v=7"></script>
+<script src="app.js?v=40"></script>
+</body>
+</html>

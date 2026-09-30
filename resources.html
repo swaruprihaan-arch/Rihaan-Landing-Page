@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#161616">
+  <meta name="description" content="Guides, references and answers for connecting DeepSeek, Claude Code, Codex, Hermes and Grok into secure Rihaan workflows.">
+  <title>Resources | Rihaan</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 66 62'%3E%3Crect width='66' height='62' rx='14' fill='%23161616'/%3E%3Cg stroke='%23fff' stroke-width='5' stroke-linecap='square'%3E%3Cline x1='33' y1='6' x2='33' y2='56'/%3E%3Cline x1='8' y1='31' x2='58' y2='31'/%3E%3Cline x1='15.3' y1='13.3' x2='50.7' y2='48.7'/%3E%3Cline x1='50.7' y1='13.3' x2='15.3' y2='48.7'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./css/site.css">
+</head>
+<body class="page page--resources">
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <a class="brand" href="./index.html" aria-label="Rihaan home">
+      <svg class="brand-mark" viewBox="0 0 66 62" aria-hidden="true" focusable="false">
+        <line x1="33" y1="1" x2="33" y2="61"></line>
+        <line x1="3" y1="31" x2="63" y2="31"></line>
+        <line x1="11.8" y1="9.8" x2="54.2" y2="52.2"></line>
+        <line x1="54.2" y1="9.8" x2="11.8" y2="52.2"></line>
+      </svg>
+      <span class="brand__name">RI<span class="grad-text">HAAN</span></span>
+    </a>
+    <nav class="site-nav" aria-label="Primary">
+      <a href="./index.html">Home</a>
+      <a href="./projects.html">Projects</a>
+      <a href="./contact.html">Contact</a>
+    </nav>
+    <button class="burger" type="button" aria-label="Open menu" aria-controls="mobile-menu" aria-expanded="false">
+      <span class="burger__box" aria-hidden="true"><span class="burger__line"></span><span class="burger__line"></span><span class="burger__line"></span></span>
+    </button>
+  </header>
+  <button class="scrim" type="button" tabindex="-1" aria-label="Close menu"></button>
+  <nav class="sheet" id="mobile-menu" aria-label="Menu" aria-hidden="true" inert>
+    <ul class="sheet__list">
+      <li><a class="sheet__link" href="./index.html">Home</a></li>
+      <li><a class="sheet__link" href="./projects.html">Projects</a></li>
+      <li><a class="sheet__link" href="./contact.html">Contact</a></li>
+    </ul>
+    <a class="sheet__ball" href="./index.html" aria-label="Home">
+      <img src="./assets/ball-accent.png" alt="">
+      <img src="./assets/ball-reveal.png" alt="">
+    </a>
+  </nav>
+
+  <main id="main">
+    <section class="hero">
+      <div class="container">
+        <div class="hero__copy">
+          <p class="eyebrow" data-reveal>Resources</p>
+          <h1 class="hero__title" data-reveal style="--d:.08s">Everything you need to <span class="grad-text">ship</span> with Rihaan.</h1>
+          <p class="hero__lede" data-reveal style="--d:.16s">Guides, references and answers for teams connecting AI agents into secure, repeatable workflows. Start with the quickstart, then go deep on the agent you use.</p>
+          <div class="hero__actions" data-reveal style="--d:.24s">
+            <a class="btn btn--primary" href="#start">Start here <span class="btn__arrow" aria-hidden="true">→</span></a>
+            <a class="btn btn--ghost" href="./secure-system.html">Security model</a>
+          </div>
+        </div>
+        <div class="hero__ball" aria-hidden="true">
+          <img src="./assets/ball-accent.png" alt="">
+          <img src="./assets/ball-reveal.png" alt="">
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="start">
+      <div class="container">
+        <div class="section__head">
+          <div>
+            <p class="eyebrow">Start here</p>
+            <h2 class="section__title">Three reads before your first run.</h2>
+          </div>
+          <p class="section__intro">Rihaan is small on purpose. A workflow is a list of steps, each step is run by an agent or a person, and every run is sandboxed and recorded. These three pages cover the rest.</p>
+        </div>
+        <div class="grid grid--3">
+          <a class="card" href="#agents" data-reveal>
+            <span class="card__num grad-text">01</span>
+            <h3 class="card__title">Quickstart</h3>
+            <p class="card__body">Install the CLI, connect one agent and run a two-step workflow end to end. Fifteen minutes, one terminal, nothing to deploy.</p>
+            <span class="card__link">Pick your agent <span class="btn__arrow" aria-hidden="true">→</span></span>
+          </a>
+          <a class="card" href="#concepts" data-reveal style="--d:.08s">
+            <span class="card__num grad-text">02</span>
+            <h3 class="card__title">Core concepts</h3>
+            <p class="card__body">Workflows, steps, connectors and approvals: the four ideas everything else is built from, in the vocabulary you will see in the audit log.</p>
+            <span class="card__link">Read the concepts <span class="btn__arrow" aria-hidden="true">→</span></span>
+          </a>
+          <a class="card" href="./secure-system.html" data-reveal style="--d:.16s">
+            <span class="card__num grad-text">03</span>
+            <h3 class="card__title">Security model</h3>
+            <p class="card__body">How isolated execution, scoped permissions and the audit trail protect every run, and what your security team will want to review.</p>
+            <span class="card__link">Open the secure system <span class="btn__arrow" aria-hidden="true">→</span></span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="concepts">
+      <div class="container">
+        <div class="section__head">
+          <div>
+            <p class="eyebrow">Core concepts</p>
+            <h2 class="section__title">Four words you will use every day.</h2>
+          </div>
+          <p class="section__intro">Everything in Rihaan, from the CLI to the audit log, is described with these four terms. Learn them once and every screen reads the same way.</p>
+        </div>
+        <ol class="steps" data-reveal>
+          <li>
+            <div>
+              <h3>Workflow</h3>
+              <p>A named list of steps with a trigger: a schedule, a webhook, a pull request or a person pressing run. Workflows are versioned, so a change is a diff you can review, not a surprise.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Step</h3>
+              <p>One unit of work, carried out by an agent, a tool or a human. A step declares what it needs, such as a repository, an API or a file, and gets nothing else.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Connector</h3>
+              <p>The bridge to an agent or a tool. Connectors hold credentials in the vault, scoped to the workflows that use them, and are never exposed to a step's output.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Approval</h3>
+              <p>A gate a person must pass before the workflow continues. Reviewers see the exact change or action, decide in one click, and the decision is written to the audit trail.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section" id="agents">
+      <div class="container">
+        <div class="section__head">
+          <div>
+            <p class="eyebrow">Agent guides</p>
+            <h2 class="section__title">Connect the agents you already use.</h2>
+          </div>
+          <p class="section__intro">Each guide covers connecting the agent, granting the smallest set of permissions it needs, and what its steps look like in the audit trail. Mix agents freely inside one workflow.</p>
+        </div>
+        <div class="grid grid--2">
+          <article class="card agent" data-reveal>
+            <img class="agent__logo" src="./assets/deepseek-logo-icon.png" alt="DeepSeek logo">
+            <div>
+              <h3 class="agent__title">DeepSeek</h3>
+              <p class="card__body">Long-context reasoning and review steps. Point it at a whole repository or a day of logs and let it summarise, review or plan before a coding agent takes over.</p>
+              <div class="agent__meta"><span class="tag">Reasoning</span><span class="tag">Review</span><span class="tag">API key</span></div>
+            </div>
+          </article>
+          <article class="card agent" data-reveal style="--d:.06s">
+            <img class="agent__logo" src="./assets/claude-ai-icon.png" alt="Claude logo">
+            <div>
+              <h3 class="agent__title">Claude Code</h3>
+              <p class="card__body">Agentic coding in a sandboxed checkout of your repository. Every edit lands as a reviewable diff, with file and network policy set per workflow.</p>
+              <div class="agent__meta"><span class="tag">Coding</span><span class="tag">Diffs</span><span class="tag">Sandbox</span></div>
+            </div>
+          </article>
+          <article class="card agent" data-reveal style="--d:.12s">
+            <img class="agent__logo" src="./assets/chatgpt-icon.png" alt="ChatGPT logo">
+            <div>
+              <h3 class="agent__title">Codex</h3>
+              <p class="card__body">Batch code generation and refactors across many repositories. Queue tasks, require approval per task and keep the full transcript for later.</p>
+              <div class="agent__meta"><span class="tag">Batch</span><span class="tag">Refactors</span><span class="tag">Transcripts</span></div>
+            </div>
+          </article>
+          <article class="card agent" data-reveal style="--d:.18s">
+            <img class="agent__logo" src="./assets/hermes-icon.png" alt="Hermes logo">
+            <div>
+              <h3 class="agent__title">Hermes</h3>
+              <p class="card__body">Lightweight assistant steps that can run on your own hardware behind Rihaan's policy layer, for work that must never leave your network.</p>
+              <div class="agent__meta"><span class="tag">Self-hosted</span><span class="tag">Private</span><span class="tag">Policy</span></div>
+            </div>
+          </article>
+          <article class="card agent" data-reveal style="--d:.24s">
+            <img class="agent__logo" src="./assets/grok-icon.png" alt="Grok logo">
+            <div>
+              <h3 class="agent__title">Grok</h3>
+              <p class="card__body">Fast conversational and research steps. Rate limits, data retention and region settings are enforced per workflow, not per developer.</p>
+              <div class="agent__meta"><span class="tag">Research</span><span class="tag">Fast</span><span class="tag">Retention</span></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <div class="container">
+        <div class="section__head">
+          <div>
+            <p class="eyebrow">Library</p>
+            <h2 class="section__title">Questions we get most.</h2>
+          </div>
+          <p class="section__intro">Short answers to the things teams ask before their first workflow. If yours is not here, the contact page reaches an engineer directly.</p>
+        </div>
+        <div class="grid grid--2" style="align-items:start">
+          <div data-reveal>
+            <details class="faq">
+              <summary>Does Rihaan store my code or prompts?</summary>
+              <p class="faq__body">Runs execute in isolated sandboxes that are destroyed afterwards. Transcripts and diffs are kept only as long as your retention policy says, in the region you choose, and are never used to train anything.</p>
+            </details>
+            <details class="faq">
+              <summary>Can I bring my own agent keys?</summary>
+              <p class="faq__body">Yes. Keys are stored encrypted in the vault, scoped to individual workflows, injected at run time and never written to logs or step output.</p>
+            </details>
+            <details class="faq">
+              <summary>How do approvals work?</summary>
+              <p class="faq__body">Any step can require a human. Reviewers see the exact diff or action, approve or reject in one click, and the decision is recorded in the audit trail with who and when.</p>
+            </details>
+            <details class="faq">
+              <summary>What happens when a step fails?</summary>
+              <p class="faq__body">The run pauses with the failing step's transcript attached. You can retry the step, skip it, or hand it to a different agent without restarting the workflow.</p>
+            </details>
+            <details class="faq">
+              <summary>Is there an API?</summary>
+              <p class="faq__body">Everything in the interface is available through the CLI and a REST API, so workflows can be created, triggered and audited from your own systems.</p>
+            </details>
+          </div>
+          <div class="grid" data-reveal style="--d:.1s">
+            <a class="card" href="./secure-system.html">
+              <h3 class="card__title" style="margin-top:0">Security overview</h3>
+              <p class="card__body">The principles, the architecture and the practices your security team will ask about, on one page.</p>
+              <span class="card__link">Open the secure system <span class="btn__arrow" aria-hidden="true">→</span></span>
+            </a>
+            <a class="card" href="./contact.html?topic=support">
+              <h3 class="card__title" style="margin-top:0">Talk to an engineer</h3>
+              <p class="card__body">Stuck on a connector, a policy or a workflow that will not behave? Send the details and a Rihaan engineer will reply.</p>
+              <span class="card__link">Contact support <span class="btn__arrow" aria-hidden="true">→</span></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="cta" data-reveal>
+          <div>
+            <h2 class="cta__title">Ready to run your first workflow?</h2>
+            <p>Tell us which agents you use and what you want to automate. We will set up a pilot workflow in your environment.</p>
+          </div>
+          <div class="cta__actions">
+            <a class="btn btn--primary" href="./contact.html">Contact us <span class="btn__arrow" aria-hidden="true">→</span></a>
+            <a class="btn btn--ghost" href="./benefits.html">See the benefits</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <a class="brand" href="./index.html" aria-label="Rihaan home">
+        <svg class="brand-mark" viewBox="0 0 66 62" aria-hidden="true" focusable="false">
+          <line x1="33" y1="1" x2="33" y2="61"></line>
+          <line x1="3" y1="31" x2="63" y2="31"></line>
+          <line x1="11.8" y1="9.8" x2="54.2" y2="52.2"></line>
+          <line x1="54.2" y1="9.8" x2="11.8" y2="52.2"></line>
+        </svg>
+        <span class="brand__name">RI<span class="grad-text">HAAN</span></span>
+      </a>
+      <nav aria-label="Footer">
+        <a href="./index.html">Home</a>
+        <a href="./projects.html">Projects</a>
+        <a href="./contact.html">Contact</a>
+      </nav>
+      <small>Rihaan. Every workflow, intelligently connected.</small>
+    </div>
+  </footer>
+
+  <script src="./js/site.js"></script>
+</body>
+</html>

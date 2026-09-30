@@ -1,0 +1,5 @@
+.DS_Store
+.backup/
+.claude/
+*.mpd.js
+model */LDConfig.ldr.js

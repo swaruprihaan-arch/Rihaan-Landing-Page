@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brick Route</title>
+<meta name="description" content="Build the analysis route for a single-cell, multiome or spatial study, one brick at a time.">
+<link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/bricks.css">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="logo" aria-hidden="true"><i class="l-red"></i><i class="l-yellow"></i><i class="l-blue"></i><i class="l-orange"></i></div>
+  <h1>Brick Route</h1>
+  <nav class="progress" id="progress" aria-label="Progress"></nav>
+  <div class="tools">
+    <button class="icon" id="undo" title="Back one step (Backspace)" aria-label="Back one step">←</button>
+    <button class="icon" id="restart" title="Start over (R)" aria-label="Start over">↺</button>
+    <button class="icon" id="sound" title="Toggle click sounds (S)" aria-label="Toggle sounds">♪</button>
+    <span class="brand">Swarup Lab · Analysis Workflow v1.0</span>
+  </div>
+</header>
+
+<main class="plate" id="plate">
+  <div class="trail" id="trail" aria-label="Choices so far"></div>
+  <section class="stage" id="stage" aria-live="polite"></section>
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+</main>
+
+<aside class="drawer" id="drawer" hidden>
+  <div class="drawer-in">
+    <button class="icon close" id="drawerClose" aria-label="Close">×</button>
+    <div id="drawerBody"></div>
+  </div>
+</aside>
+
+<div class="hint" id="hint">Press <kbd>1</kbd>–<kbd>5</kbd> to choose · <kbd>?</kbd> on a brick for detail · <kbd>Backspace</kbd> to go back</div>
+
+<script src="assets/js/palette.js"></script>
+<script src="assets/js/modules.js"></script>
+<script src="assets/js/steps.js"></script>
+<script src="assets/js/route.js"></script>
+<script src="assets/js/audio.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

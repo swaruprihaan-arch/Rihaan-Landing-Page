@@ -1,0 +1,137 @@
+/* ==========================================================================
+   Projects page: gallery grid and cards for the static previews.
+   Loaded after css/site.css and only adds what that file does not have.
+   ========================================================================== */
+
+.projects-status {
+  min-height: 1.5em;
+  margin: 18px 0 0;
+  font-size: 14px;
+  text-align: center;
+  color: var(--muted);
+  transition: color .2s;
+}
+.projects-status[data-tone="ok"] { color: var(--accent-2); }
+.projects-status[data-tone="error"] { color: var(--danger); }
+
+/* --------------------------------------------------------------------------
+   Gallery
+   -------------------------------------------------------------------------- */
+.projects-head__side {
+  display: grid;
+  gap: 10px;
+}
+.projects-count {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1;
+}
+
+.projects-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.project-card {
+  min-width: 0;
+  padding: 12px 12px 22px;
+  animation: project-in .6s var(--ease-reveal) both;
+}
+.project-card__preview {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #0f0f0f;
+  cursor: pointer;
+}
+.project-card__frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 1280px;
+  height: 800px;
+  border: 0;
+  background: transparent;
+  transform-origin: 0 0;
+  transform: scale(var(--scale, .25));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .4s ease;
+}
+.project-card__frame.is-loaded { opacity: 1; }
+.project-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 0 12px;
+}
+.project-card__title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1.15;
+  margin: 20px 0 6px;
+  overflow-wrap: anywhere;
+}
+.project-card__meta {
+  margin: 0 0 20px;
+  font-size: 13px;
+  color: var(--dim);
+  overflow-wrap: anywhere;
+}
+.project-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+}
+.project-card__btn {
+  height: 38px;
+  padding: 0 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+  letter-spacing: .02em;
+  cursor: pointer;
+  transition: background .25s, border-color .25s, color .25s, transform .25s var(--ease-soft);
+}
+.project-card__btn:hover { border-color: var(--ink); }
+.project-card__btn:active { transform: translateY(1px); }
+.project-card__btn:focus-visible { border-radius: 999px; }
+.project-card__btn--primary {
+  background: var(--ink);
+  color: var(--surface);
+  border-color: transparent;
+}
+.project-card__btn--primary:hover { background: var(--grad); border-color: transparent; }
+
+@keyframes project-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+@media (max-width: 1100px) {
+  .projects-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+  /* minmax(0, 1fr), not 1fr: WebKit otherwise keeps a card's stale
+     min-content width after a resize and the grid overflows the viewport. */
+  .projects-grid { grid-template-columns: minmax(0, 1fr); }
+  .project-card { padding: 10px 10px 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .project-card { animation: none; }
+  .project-card__btn, .project-card__frame, .projects-status { transition: none; }
+}

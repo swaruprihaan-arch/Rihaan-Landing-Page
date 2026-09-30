@@ -1,0 +1,7 @@
+.DS_Store
+node_modules/
+.claude/
+.backup/
+__pycache__/
+*.pyc
+.env

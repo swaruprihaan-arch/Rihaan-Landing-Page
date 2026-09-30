@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="en" class="anim">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#161616">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 66 62'%3E%3Crect width='66' height='62' rx='14' fill='%23161616'/%3E%3Cg stroke='%23fff' stroke-width='5' stroke-linecap='square'%3E%3Cline x1='33' y1='6' x2='33' y2='56'/%3E%3Cline x1='8' y1='31' x2='58' y2='31'/%3E%3Cline x1='15.3' y1='13.3' x2='50.7' y2='48.7'/%3E%3Cline x1='50.7' y1='13.3' x2='15.3' y2='48.7'/%3E%3C/g%3E%3C/svg%3E">
+  <title>Rihaan</title>
+  <style>
+    /* ------------------------------------------------------------------
+       1. Fonts
+       Orbit Sans and Orbit Display ship as embedded TrueType data URLs:
+         src: url(data:font/ttf;base64,...) format("truetype");
+       The original index.html that carries those base64 blocks was not in
+       the kit, so until it is embedded (see embed-fonts.py) each face
+       resolves to a locally installed copy and otherwise falls through to
+       the stack the spec names.
+       ------------------------------------------------------------------ */
+    @font-face {
+      font-family: "Orbit Sans";
+      font-style: normal;
+      font-weight: 400;
+      font-display: block;
+      src: local("Orbit Sans"), local("OrbitSans"), local("OrbitSans-Regular");
+    }
+    @font-face {
+      font-family: "Orbit Display";
+      font-style: normal;
+      font-weight: 400;
+      font-display: block;
+      src: local("Orbit Display"), local("OrbitDisplay"), local("OrbitDisplay-Regular");
+    }
+
+    /* ------------------------------------------------------------------
+       0. Document shell
+       ------------------------------------------------------------------ */
+    :root {
+      --ink: #ffffff;
+      --surface: #161616;
+      --orb-reveal: cubic-bezier(.16, 1, .3, 1);
+      --orb-soft: cubic-bezier(.25, .8, .28, 1);
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    body {
+      font-family: "Orbit Sans", Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; color: inherit; }
+    :focus-visible { outline: 2px solid #98fbcb; outline-offset: 3px; }
+
+    .viewport {
+      position: fixed;
+      inset: 0;
+      background: var(--surface);
+    }
+
+    .stage {
+      position: absolute;
+      inset: 0;
+      contain: strict;
+      isolation: isolate;
+      background: var(--surface);
+    }
+
+    /* ------------------------------------------------------------------
+       3. Brand mark
+       ------------------------------------------------------------------ */
+    .brand-mark {
+      position: absolute;
+      z-index: 4;
+      top: 2.141745dvh;
+      left: 3.854167vw;
+      width: clamp(34px, min(3.4375vw, 5.2dvh), 66px);
+      height: auto;
+      display: block;
+      overflow: visible;
+    }
+    .brand-mark line {
+      stroke: var(--ink);
+      stroke-width: 5px;
+      stroke-linecap: square;
+    }
+
+    /* ------------------------------------------------------------------
+       3. Primary nav
+       ------------------------------------------------------------------ */
+    .primary-nav {
+      position: absolute;
+      z-index: 4;
+      inset: 0;
+      pointer-events: none;
+    }
+    .primary-nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .primary-nav li {
+      position: absolute;
+      top: 3.426791dvh;
+      transform-origin: left center;
+      font-size: clamp(13px, min(1.302083vw, 2.05dvh), 25px);
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+    .primary-nav li:nth-child(1) { left: 10.104167vw; transform: scaleX(1.165); }
+    .primary-nav li:nth-child(2) { left: 17.526042vw; transform: scaleX(1.168); }
+    .primary-nav li:nth-child(3) { left: 26.5vw; transform: scaleX(1.168); }
+    .primary-nav a {
+      pointer-events: auto;
+      display: inline-block;
+      color: var(--ink);
+    }
+
+    /* ------------------------------------------------------------------
+       3. Wordmark
+       ------------------------------------------------------------------ */
+    .orbit-word {
+      position: absolute;
+      z-index: 1;
+      top: 11.565421dvh;
+      left: 4.348958vw;
+      margin: 0;
+      font-family: "Orbit Display", "Times New Roman", Times, serif;
+      font-weight: 400;
+      /* Six letters: the spec's 27.8125vw / 27.5vw were sized for the five-letter
+         ORBIT; scaled by that word's width ratio (0.785) so RIHAAN spans the same
+         width on screen. The dvh caps are unchanged. */
+      font-size: min(21.8314vw, 55dvh);
+      line-height: 1;
+      letter-spacing: 0.033708em;
+      white-space: nowrap;
+      color: var(--ink);
+    }
+    .orbit-word__mask { display: block; }
+    .orbit-word__inner { display: inline-block; }
+    .orbit-word__white { color: #fff; }
+    .orbit-word__pink {
+      display: inline-block;
+      background: linear-gradient(180deg, #ccfde5 0%, #98fbcb 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* ------------------------------------------------------------------
+       3. Ball stack
+       ------------------------------------------------------------------ */
+    .ball {
+      position: absolute;
+      z-index: 2;
+      top: 14.749065dvh;
+      left: 49.121328vw;
+      height: 68dvh;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+    .ball__sizer {
+      display: block;
+      height: 100%;
+      width: auto;
+      visibility: hidden;
+    }
+    .ball__layer {
+      position: absolute;
+      inset: 0;
+      -webkit-mask-size: 100% 100%;
+      mask-size: 100% 100%;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+    }
+    .ball__layer img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      image-rendering: pixelated;
+    }
+    .ball__layer--top {
+      -webkit-mask-image: linear-gradient(#0000, #0000);
+      mask-image: linear-gradient(#0000, #0000);
+    }
+
+    /* ------------------------------------------------------------------
+       3. AI logo row
+       ------------------------------------------------------------------ */
+    .ai-row {
+      position: absolute;
+      z-index: 3;
+      left: 49.121328vw;
+      bottom: 4.361371dvh;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: flex-end;
+      gap: clamp(20px, 3.2vw, 64px);
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      pointer-events: none;
+    }
+    .ai-row__item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.9dvh;
+    }
+    .ai-row__logo {
+      height: clamp(22px, 3.8dvh, 46px);
+      width: clamp(22px, 3.8dvh, 46px);
+      object-fit: contain;
+      display: block;
+    }
+    .ai-row__name {
+      font-family: "Orbit Sans", Arial, Helvetica, sans-serif;
+      color: #f7f7f7;
+      font-size: clamp(11px, min(0.9375vw, 1.5dvh), 18px);
+      letter-spacing: 0.026923em;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    /* ------------------------------------------------------------------
+       3. Corner copy
+       ------------------------------------------------------------------ */
+    .support-copy {
+      position: absolute;
+      z-index: 3;
+      bottom: 4.361371dvh;
+      margin: 0;
+      color: #f7f7f7;
+      font-size: clamp(14px, min(1.40625vw, 2.102804dvh), 27px);
+      line-height: 1.32;
+      white-space: nowrap;
+      transform-origin: left bottom;
+    }
+    .support-copy--left  { left: 3.177083vw; transform: scaleX(1.073); }
+    .support-copy--right { left: 78.28125vw; transform: scaleX(1.058); }
+    .support-copy__inner { display: block; }
+
+    /* ------------------------------------------------------------------
+       3 / 6. Menu button (three lines) and side menu, at every size
+       ------------------------------------------------------------------ */
+    .burger {
+      display: grid;
+      place-items: center;
+      position: absolute;
+      z-index: 12;
+      top: 2.336449dvh;
+      right: 7.5vw;
+      width: clamp(40px, 4.439252dvh, 57px);
+      height: clamp(40px, 4.439252dvh, 57px);
+      border: 0;
+      padding: 0;
+      margin: 0;
+      border-radius: 50%;
+      background: var(--ink);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: background .25s;
+    }
+    .burger:hover { background: #98fbcb; }
+    .burger__box {
+      position: relative;
+      width: 18px;
+      height: 14px;
+    }
+    .burger__line {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--surface);
+      transition: transform .34s var(--orb-soft), opacity .2s ease;
+    }
+    .burger__line:nth-child(1) { top: 0; }
+    .burger__line:nth-child(2) { top: 6px; }
+    .burger__line:nth-child(3) { top: 12px; }
+    .menu-open .burger__line:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .menu-open .burger__line:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .menu-open .burger__line:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    .scrim {
+      display: block;
+      position: absolute;
+      z-index: 9;
+      inset: 0;
+      border: 0;
+      padding: 0;
+      margin: 0;
+      background: rgba(0, 0, 0, .5);
+      opacity: 0;
+      pointer-events: none;
+      cursor: pointer;
+      transition: opacity .32s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .menu-open .scrim { opacity: 1; pointer-events: auto; }
+
+    .sheet {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      z-index: 10;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: min(84vw, 440px);
+      box-sizing: border-box;
+      padding: calc(2.336449dvh + 57px + 28px) clamp(28px, 4vw, 52px) 0;
+      overflow: hidden;
+      background: rgba(22, 22, 22, .93);
+      -webkit-backdrop-filter: blur(22px) saturate(1.3);
+      backdrop-filter: blur(22px) saturate(1.3);
+      border-left: 1px solid rgba(255, 255, 255, .1);
+      transform: translateX(100%);
+      visibility: hidden;
+      transition: transform .44s var(--orb-reveal), visibility 0s linear .44s;
+    }
+    .menu-open .sheet {
+      transform: none;
+      visibility: visible;
+      transition: transform .44s var(--orb-reveal);
+    }
+    .sheet__list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(14px, 2.6dvh, 26px);
+    }
+    .sheet__link {
+      display: inline-block;
+      font-family: "Orbit Display", "Times New Roman", Times, serif;
+      font-size: clamp(30px, 4.6dvh, 48px);
+      line-height: 1.1;
+      letter-spacing: 0.01em;
+      color: var(--ink);
+      transition: color .2s;
+    }
+    .sheet__link:hover { color: #98fbcb; }
+    .sheet__link[aria-current="page"] {
+      background: linear-gradient(180deg, #ccfde5 0%, #98fbcb 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+    /* The ball in the menu: largest item, pinned to the bottom, accent colours
+       so it never matches the classic ball on this home screen. */
+    .sheet__ball {
+      position: relative;
+      display: block;
+      margin-top: auto;
+      align-self: center;
+      width: min(100%, 46dvh);
+      aspect-ratio: 1 / 1;
+      margin-bottom: -7%;
+      flex: none;
+    }
+    .sheet__ball img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      image-rendering: pixelated;
+      transition: opacity .5s var(--orb-soft);
+    }
+    .sheet__ball img + img { opacity: 0; }
+    .sheet__ball:hover img + img,
+    .sheet__ball:focus-visible img + img { opacity: 1; }
+
+    @media (max-width: 900px), (max-aspect-ratio: 4 / 5) {
+      /* Home and Contact stay visible on small screens, spaced clear of the mark */
+      .primary-nav li { font-size: clamp(13px, 3.6vw, 16px); }
+      .primary-nav li:nth-child(1) { left: 17vw; }
+      .primary-nav li:nth-child(2) { left: 34vw; }
+      .primary-nav li:nth-child(3) { left: 54vw; }
+      .burger {
+        right: 5vw;
+        width: clamp(40px, 5.6dvh, 52px);
+        height: clamp(40px, 5.6dvh, 52px);
+      }
+      .sheet { width: min(80vw, 360px); }
+    }
+
+    /* ------------------------------------------------------------------
+       6. Responsive essentials
+       ------------------------------------------------------------------ */
+    @media (max-width: 1200px), (orientation: portrait) {
+      .orbit-word {
+        left: 0;
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+    @media (max-aspect-ratio: 4 / 5) {
+      .ball {
+        left: 50vw;
+        top: 24dvh;
+        height: min(46dvh, 86vw);
+      }
+      .orbit-word { font-size: min(21.5861vw, 18dvh); }
+
+      .support-copy {
+        white-space: normal;
+        max-width: 40vw;
+      }
+      .support-copy--right {
+        left: auto;
+        right: 3.177083vw;
+        text-align: right;
+        transform-origin: right bottom;
+      }
+
+      .ai-row {
+        left: 50vw;
+        top: calc(24dvh + min(46dvh, 86vw) + 2.5dvh);
+        bottom: auto;
+        gap: clamp(14px, 5vw, 28px);
+      }
+      .ai-row__logo {
+        width: clamp(20px, 5.5vw, 34px);
+        height: clamp(20px, 5.5vw, 34px);
+      }
+      .ai-row__name { font-size: clamp(10px, 2.8vw, 13px); }
+    }
+
+    @media (max-aspect-ratio: 4 / 5) and (max-width: 359.98px) {
+      /* Five logos: wrap into centred rows (3 + 2) instead of one long line. */
+      .ai-row {
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 200px;
+        row-gap: 2dvh;
+      }
+    }
+
+    /* ------------------------------------------------------------------
+       5. Entrance (once, while <html class="anim">)
+       ------------------------------------------------------------------ */
+    @keyframes orb-word {
+      from { transform: translateY(118%); }
+      to   { transform: translateY(0); }
+    }
+    @keyframes orb-subject {
+      from { opacity: 0; transform: translateX(-50%) translateY(3.4dvh); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+    @keyframes orb-corner {
+      from { opacity: 0; transform: translateY(1.8dvh); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes orb-quiet {
+      from { opacity: 0; transform: translateY(0.9dvh); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes orb-dim {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes orb-stage {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .anim .brand-mark { animation: orb-quiet 620ms var(--orb-soft) 100ms both; }
+    .anim .primary-nav li:nth-child(1) { animation: orb-dim 550ms var(--orb-soft) 180ms both; }
+    .anim .primary-nav li:nth-child(2) { animation: orb-dim 550ms var(--orb-soft) 225ms both; }
+    .anim .primary-nav li:nth-child(3) { animation: orb-dim 550ms var(--orb-soft) 260ms both; }
+    .anim .burger { animation: orb-quiet 620ms var(--orb-soft) 340ms both; }
+
+    .anim .orbit-word__mask {
+      overflow: hidden;
+      padding: 0.12em 0.16em 0.06em;
+      margin: -0.12em -0.16em -0.06em;
+    }
+    .anim .orbit-word__inner { animation: orb-word 1150ms var(--orb-reveal) 300ms both; }
+    .anim .ball { animation: orb-subject 1150ms var(--orb-reveal) 660ms both; }
+    .anim .support-copy__inner { animation: orb-corner 720ms var(--orb-soft) 980ms both; }
+    .anim .ai-row__item:nth-child(1) { animation: orb-corner 620ms var(--orb-soft) 1120ms both; }
+    .anim .ai-row__item:nth-child(2) { animation: orb-corner 620ms var(--orb-soft) 1180ms both; }
+    .anim .ai-row__item:nth-child(3) { animation: orb-corner 620ms var(--orb-soft) 1240ms both; }
+    .anim .ai-row__item:nth-child(4) { animation: orb-corner 620ms var(--orb-soft) 1300ms both; }
+    .anim .ai-row__item:nth-child(5) { animation: orb-corner 620ms var(--orb-soft) 1360ms both; }
+
+    @media (max-width: 900px), (max-aspect-ratio: 4 / 5) {
+      .anim .burger { animation: orb-quiet 620ms var(--orb-soft) 100ms both; }
+      .anim .orbit-word__inner { animation-delay: 240ms; }
+      .anim .ball { animation-delay: 560ms; }
+      .anim .support-copy__inner { animation-delay: 860ms; }
+      .anim .ai-row__item:nth-child(1) { animation-delay: 980ms; }
+      .anim .ai-row__item:nth-child(2) { animation-delay: 1030ms; }
+      .anim .ai-row__item:nth-child(3) { animation-delay: 1080ms; }
+      .anim .ai-row__item:nth-child(4) { animation-delay: 1130ms; }
+      .anim .ai-row__item:nth-child(5) { animation-delay: 1180ms; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .anim .stage * { animation: none !important; }
+      .anim .orbit-word__mask { overflow: visible; }
+      .anim .stage { animation: orb-stage 280ms ease-out both; }
+      .burger__line, .scrim, .sheet, .sheet__ball img { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="viewport">
+    <section class="stage" aria-label="Rihaan poster">
+
+      <svg class="brand-mark" viewBox="0 0 66 62" aria-hidden="true" focusable="false">
+        <line x1="33" y1="1" x2="33" y2="61"></line>
+        <line x1="3" y1="31" x2="63" y2="31"></line>
+        <line x1="11.8" y1="9.8" x2="54.2" y2="52.2"></line>
+        <line x1="54.2" y1="9.8" x2="11.8" y2="52.2"></line>
+      </svg>
+
+      <nav class="primary-nav" aria-label="Primary">
+        <ul>
+          <li><a href="./index.html" aria-current="page">Home</a></li>
+          <li><a href="./projects.html">Projects</a></li>
+          <li><a href="./contact.html">Contact</a></li>
+        </ul>
+      </nav>
+
+      <h1 class="orbit-word" id="orbit-title" aria-label="Rihaan">
+        <span class="orbit-word__mask">
+          <span class="orbit-word__inner"><span class="orbit-word__white">RI</span><span class="orbit-word__pink">HAAN</span></span>
+        </span>
+      </h1>
+
+      <div class="ball">
+        <img class="ball__sizer" src="./assets/ball-front.png" alt="" aria-hidden="true">
+        <div class="ball__layer ball__layer--bg">
+          <img src="./assets/ball-front.png" alt="Retro pixel-art soccer ball">
+        </div>
+        <div class="ball__layer ball__layer--top" aria-hidden="true">
+          <img src="./assets/ball-reveal.png" alt="">
+        </div>
+      </div>
+
+      <ul class="ai-row" aria-label="Works with">
+        <li class="ai-row__item">
+          <img class="ai-row__logo" src="./assets/deepseek-logo-icon.png" alt="DeepSeek logo">
+          <span class="ai-row__name">DeepSeek</span>
+        </li>
+        <li class="ai-row__item">
+          <img class="ai-row__logo" src="./assets/claude-ai-icon.png" alt="Claude logo">
+          <span class="ai-row__name">Claude Code</span>
+        </li>
+        <li class="ai-row__item">
+          <img class="ai-row__logo" src="./assets/chatgpt-icon.png" alt="ChatGPT logo">
+          <span class="ai-row__name">Codex</span>
+        </li>
+        <li class="ai-row__item">
+          <img class="ai-row__logo" src="./assets/hermes-icon.png" alt="Hermes logo">
+          <span class="ai-row__name">Hermes</span>
+        </li>
+        <li class="ai-row__item">
+          <img class="ai-row__logo" src="./assets/grok-icon.png" alt="Grok logo">
+          <span class="ai-row__name">Grok</span>
+        </li>
+      </ul>
+
+      <p class="support-copy support-copy--left">
+        <span class="support-copy__inner">Every workflow,<br>intelligently connected.</span>
+      </p>
+      <p class="support-copy support-copy--right">
+        <span class="support-copy__inner">Less manual work.<br>More meaningful output.</span>
+      </p>
+
+      <button class="burger" type="button" aria-label="Open menu" aria-controls="mobile-menu" aria-expanded="false">
+        <span class="burger__box" aria-hidden="true">
+          <span class="burger__line"></span>
+          <span class="burger__line"></span>
+          <span class="burger__line"></span>
+        </span>
+      </button>
+      <button class="scrim" type="button" tabindex="-1" aria-label="Close menu"></button>
+      <nav class="sheet" id="mobile-menu" aria-label="Menu" aria-hidden="true" inert>
+        <ul class="sheet__list">
+          <li><a class="sheet__link" href="./index.html" aria-current="page">Home</a></li>
+          <li><a class="sheet__link" href="./projects.html">Projects</a></li>
+          <li><a class="sheet__link" href="./contact.html">Contact</a></li>
+        </ul>
+        <a class="sheet__ball" href="./index.html" aria-label="Home">
+          <img src="./assets/ball-accent.png" alt="">
+          <img src="./assets/ball-reveal.png" alt="">
+        </a>
+      </nav>
+
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var root = document.documentElement;
+      var stage = document.querySelector('.stage');
+
+      /* ==============================================================
+         5. Entrance: drop .anim after the last orb-* animation ends
+         ============================================================== */
+      var entranceDone = false;
+      function endEntrance() {
+        if (entranceDone) return;
+        entranceDone = true;
+        root.classList.remove('anim');
+      }
+      (function watchEntrance() {
+        var all = (typeof document.getAnimations === 'function') ? document.getAnimations() : [];
+        var orb = all.filter(function (a) {
+          return typeof a.animationName === 'string' && a.animationName.indexOf('orb-') === 0;
+        });
+        if (orb.length) {
+          Promise.all(orb.map(function (a) { return a.finished.catch(function () {}); })).then(endEntrance);
+        }
+        setTimeout(endEntrance, 6000); /* safety */
+      })();
+
+      /* ==============================================================
+         6. Mobile menu: burger, scrim, frosted sheet, Escape, Tab trap
+         ============================================================== */
+      var burger = document.querySelector('.burger');
+      var scrim = document.querySelector('.scrim');
+      var sheet = document.getElementById('mobile-menu');
+      var menuOpen = false;
+
+      function setMenu(open) {
+        menuOpen = open;
+        root.classList.toggle('menu-open', open);
+        burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+        if (open) {
+          sheet.removeAttribute('inert');
+          sheet.removeAttribute('aria-hidden');
+          var first = sheet.querySelector('a');
+          if (first) first.focus({ preventScroll: true });
+        } else {
+          sheet.setAttribute('inert', '');
+          sheet.setAttribute('aria-hidden', 'true');
+        }
+      }
+      function closeMenu() {
+        if (!menuOpen) return;
+        setMenu(false);
+        burger.focus({ preventScroll: true });
+      }
+
+      burger.addEventListener('click', function () {
+        if (menuOpen) closeMenu(); else setMenu(true);
+      });
+      scrim.addEventListener('click', closeMenu);
+      sheet.addEventListener('click', function (e) {
+        if (e.target && e.target.closest('a')) closeMenu();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (!menuOpen) return;
+        if (e.key === 'Escape' || e.key === 'Esc') {
+          e.preventDefault();
+          closeMenu();
+          return;
+        }
+        if (e.key === 'Tab') {
+          /* Move focus ourselves so it can never land behind the scrim (Safari). */
+          e.preventDefault();
+          var items = [burger].concat(Array.prototype.slice.call(sheet.querySelectorAll('a[href], button')));
+          var i = items.indexOf(document.activeElement);
+          var next = i === -1 ? (e.shiftKey ? items.length - 1 : 0) : (i + (e.shiftKey ? -1 : 1) + items.length) % items.length;
+          items[next].focus({ preventScroll: true });
+        }
+      });
+
+      /* ==============================================================
+         4. Mouse morph-reveal trail
+         ============================================================== */
+      var TRAIL_MAX_POINTS  = 60;
+      var TRAIL_HEAD_R      = 140;
+      var TRAIL_NOISE_AMP   = 44;
+      var TRAIL_BLOB_PTS    = 24;
+      var TRAIL_FADE_SPEED  = 0.92;
+      var TRAIL_SAMPLE_DIST = 8;
+
+      function drawMorphBlob(ctx, cx, cy, r, t, seed) {
+        if (r < 2) return;
+        var n = TRAIL_BLOB_PTS;
+        var pts = new Array(n);
+        var i, angle, n1, n2, n3, noise, rr, p, q;
+        for (i = 0; i < n; i++) {
+          angle = (i / n) * Math.PI * 2;
+          n1 = Math.sin(angle * 3 + t * 1.4 + seed) * 0.45;
+          n2 = Math.sin(angle * 5 - t * 0.9 + seed * 2.3) * 0.3;
+          n3 = Math.cos(angle * 2 + t * 1.8 + seed * 0.7) * 0.25;
+          noise = (n1 + n2 + n3) * TRAIL_NOISE_AMP * (r / TRAIL_HEAD_R);
+          rr = r + noise;
+          pts[i] = { x: cx + Math.cos(angle) * rr, y: cy + Math.sin(angle) * rr };
+        }
+        ctx.beginPath();
+        p = pts[n - 1];
+        q = pts[0];
+        ctx.moveTo((p.x + q.x) / 2, (p.y + q.y) / 2);
+        for (i = 0; i < n; i++) {
+          p = pts[i];
+          q = pts[(i + 1) % n];
+          ctx.quadraticCurveTo(p.x, p.y, (p.x + q.x) / 2, (p.y + q.y) / 2);
+        }
+        ctx.closePath();
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+      }
+
+      /* Mask transport.
+         Chrome/Firefox: maskImage = url(canvas.toDataURL()) every active frame.
+         WebKit (Safari) loads data-URL images asynchronously, and once the PNG
+         passes a few tens of KB a freshly assigned mask paints fully transparent
+         until it has loaded; with a new mask every frame the ball never shows.
+         There the hidden canvas is a CSS canvas that the mask reads directly
+         (-webkit-canvas()), so nothing is encoded or loaded per frame. A WebKit
+         without CSS canvases pre-loads each data URL before applying it. */
+      var cssCanvasMasks = typeof document.getCSSCanvasContext === 'function' &&
+        typeof CSS !== 'undefined' && typeof CSS.supports === 'function' &&
+        CSS.supports('-webkit-mask-image', '-webkit-canvas(orb-probe)');
+      var webKitOnly = !cssCanvasMasks && /AppleWebKit/.test(navigator.userAgent) &&
+        !/Chrome|Chromium|CriOS|Edg|OPR/.test(navigator.userAgent);
+      var layerSeq = 0;
+
+      function MorphTrailLayer(el, invert) {
+        this.el = el;
+        this.invert = invert;
+        this.mode = cssCanvasMasks ? 'css-canvas' : (webKitOnly ? 'preload' : 'data-url');
+        this.name = 'orb-trail-' + (++layerSeq);
+        this.width = 1;
+        this.height = 1;
+        this.pending = 0;
+        if (this.mode === 'css-canvas') {
+          this.canvas = null;
+          this.ctx = document.getCSSCanvasContext('2d', this.name, 1, 1);
+          this.paint([], 0);
+          el.style.setProperty('-webkit-mask-image', '-webkit-canvas(' + this.name + ')');
+          el.style.setProperty('-webkit-mask-size', '100% 100%');
+          el.style.setProperty('-webkit-mask-repeat', 'no-repeat');
+        } else {
+          this.canvas = document.createElement('canvas');
+          this.canvas.style.display = 'none';
+          this.canvas.setAttribute('aria-hidden', 'true');
+          this.canvas.width = 1;
+          this.canvas.height = 1;
+          el.parentNode.appendChild(this.canvas);
+          this.ctx = this.canvas.getContext('2d');
+        }
+      }
+      MorphTrailLayer.prototype.resize = function (w, h) {
+        w = Math.max(1, Math.round(w));
+        h = Math.max(1, Math.round(h));
+        if (w === this.width && h === this.height) return;
+        this.width = w;
+        this.height = h;
+        if (this.mode === 'css-canvas') {
+          this.ctx = document.getCSSCanvasContext('2d', this.name, w, h);
+          this.paint([], 0);
+        } else {
+          this.canvas.width = w;
+          this.canvas.height = h;
+        }
+      };
+      MorphTrailLayer.prototype.paint = function (points, t) {
+        var ctx = this.ctx;
+        var w = this.width;
+        var h = this.height;
+        var i, p;
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.globalAlpha = 1;
+        ctx.clearRect(0, 0, w, h);
+        if (!this.invert) {
+          /* FRONT: solid white, blobs punch holes */
+          ctx.fillStyle = '#fff';
+          ctx.fillRect(0, 0, w, h);
+          ctx.globalCompositeOperation = 'destination-out';
+        }
+        /* REVEAL: clear canvas, white blobs are the only visible area */
+        for (i = 0; i < points.length; i++) {
+          p = points[i];
+          ctx.globalAlpha = p.alpha;
+          drawMorphBlob(ctx, p.x, p.y, p.r, t, p.seed);
+        }
+        ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = 'source-over';
+      };
+      MorphTrailLayer.prototype.apply = function (dataUrl) {
+        var url = 'url(' + dataUrl + ')';
+        this.el.style.setProperty('-webkit-mask-image', url);
+        this.el.style.setProperty('mask-image', url);
+        this.el.style.setProperty('-webkit-mask-size', '100% 100%');
+        this.el.style.setProperty('mask-size', '100% 100%');
+        this.el.style.setProperty('-webkit-mask-repeat', 'no-repeat');
+        this.el.style.setProperty('mask-repeat', 'no-repeat');
+      };
+      MorphTrailLayer.prototype.render = function (points, t) {
+        this.paint(points, t);
+        if (this.mode === 'css-canvas') return; /* WebKit repaints from the CSS canvas */
+        var dataUrl = this.canvas.toDataURL();
+        if (this.mode === 'preload') {
+          var self = this;
+          var seq = ++this.pending;
+          var img = new Image();
+          img.onload = function () {
+            var done = function () { if (seq === self.pending) self.apply(dataUrl); };
+            if (img.decode) img.decode().then(done, done); else done();
+          };
+          img.src = dataUrl;
+          return;
+        }
+        this.apply(dataUrl);
+      };
+
+      var ball = document.querySelector('.ball');
+      var layers = [
+        new MorphTrailLayer(document.querySelector('.ball__layer--bg'), false),
+        new MorphTrailLayer(document.querySelector('.ball__layer--top'), true)
+      ];
+
+      var points = [];
+      var headRadius = 0;
+      var hovering = false;
+      var time = 0;
+      var mouse = { x: 0, y: 0 };
+      var lastSample = null;
+      var raf = 0;
+      var lastHadInk = false;
+
+      function syncSize() {
+        var rect = ball.getBoundingClientRect();
+        for (var i = 0; i < layers.length; i++) layers[i].resize(rect.width, rect.height);
+      }
+      function toCanvasSpace(e) {
+        var rect = ball.getBoundingClientRect();
+        var l = layers[0];
+        if (rect.width > 0 && rect.height > 0) {
+          mouse.x = (e.clientX - rect.left) * (l.width / rect.width);
+          mouse.y = (e.clientY - rect.top) * (l.height / rect.height);
+        }
+      }
+
+      function frame() {
+        var targetR = hovering ? TRAIL_HEAD_R : 0;
+        headRadius += (targetR - headRadius) * (hovering ? 0.14 : 0.04);
+
+        if (hovering && headRadius > 5) {
+          var dx = lastSample ? mouse.x - lastSample.x : Infinity;
+          var dy = lastSample ? mouse.y - lastSample.y : Infinity;
+          if (!lastSample || Math.sqrt(dx * dx + dy * dy) > TRAIL_SAMPLE_DIST) {
+            points.push({ x: mouse.x, y: mouse.y, r: headRadius, alpha: 1, seed: Math.random() * 100 });
+            if (points.length > TRAIL_MAX_POINTS) points.splice(0, points.length - TRAIL_MAX_POINTS);
+            lastSample = { x: mouse.x, y: mouse.y };
+          }
+        }
+
+        for (var i = points.length - 1; i >= 0; i--) {
+          var p = points[i];
+          p.alpha *= TRAIL_FADE_SPEED;
+          p.r *= 0.995;
+          if (p.alpha < 0.01) points.splice(i, 1);
+        }
+
+        time += 0.016;
+
+        var hasInk = points.length > 0;
+        if (hasInk || lastHadInk) {
+          layers[0].render(points, time);
+          layers[1].render(points, time);
+        }
+        lastHadInk = hasInk;
+
+        if (hovering || headRadius > 0.5 || hasInk) {
+          raf = requestAnimationFrame(frame);
+        } else {
+          raf = 0;
+          headRadius = 0;
+          lastSample = null;
+        }
+      }
+      function wake() {
+        if (!raf) raf = requestAnimationFrame(frame);
+      }
+
+      stage.addEventListener('mouseenter', function (e) { hovering = true; toCanvasSpace(e); wake(); });
+      stage.addEventListener('mousemove', function (e) { hovering = true; toCanvasSpace(e); wake(); });
+      stage.addEventListener('mouseleave', function () { hovering = false; lastSample = null; wake(); });
+
+      if (typeof ResizeObserver === 'function') {
+        new ResizeObserver(syncSize).observe(ball);
+      }
+      window.addEventListener('resize', syncSize);
+      window.addEventListener('load', syncSize);
+      syncSize();
+    })();
+  </script>
+</body>
+</html>
