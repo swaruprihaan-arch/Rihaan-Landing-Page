@@ -125,9 +125,22 @@ async function handleContact(req, res) {
   if (data.website) { json(200, { ok: true }); return; } /* honeypot */
   if (!name || !message || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { json(400, { ok: false, error: 'Please fill in your name, a valid email and a message.' }); return; }
 
-  const text = `Name: ${name}\nEmail: ${email}\nCompany: ${company || '-'}\nTopic: ${topic || '-'}\nPage: ${page || '-'}\nIP: ${ip || '-'}\n\n${message}`;
-  const html = `<p><b>Name:</b> ${esc(name)}<br><b>Email:</b> <a href="mailto:${esc(email)}">${esc(email)}</a><br><b>Company:</b> ${esc(company || '-')}<br><b>Topic:</b> ${esc(topic || '-')}<br><b>Page:</b> ${esc(page || '-')}</p><pre style="white-space:pre-wrap;font:inherit">${esc(message)}</pre>`;
-  const payload = JSON.stringify({ from: CONTACT_FROM, to: [CONTACT_TO], reply_to: email, subject: `[rihaan.net] ${topic || 'Contact'} from ${name}`, text, html });
+  /* Hidden email draft: visitors only see the form; their answers fill the
+     blanks in this template on the server. */
+  const TOPICS = { project: 'a project', collab: 'working together', question: 'a question', other: 'something else' };
+  const topicText = TOPICS[topic] || 'getting in touch';
+  const firstName = name.split(/\s+/)[0];
+  const intro = `Hi Rihaan,\n\nMy name is ${name}${company ? ` from ${company}` : ''}, and I'm reaching out about ${topicText}.`;
+  const outro = `You can reply to me at ${email}.\n\nThanks,\n${name}`;
+  const text = `${intro}\n\n${message}\n\n${outro}\n\n--\nSent from the contact form on ${page || 'rihaan.net'}`;
+  const html = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#161616">`
+    + `<p>Hi Rihaan,</p>`
+    + `<p>My name is <b>${esc(name)}</b>${company ? ` from <b>${esc(company)}</b>` : ''}, and I'm reaching out about <b>${esc(topicText)}</b>.</p>`
+    + `<p style="white-space:pre-wrap">${esc(message)}</p>`
+    + `<p>You can reply to me at <a href="mailto:${esc(email)}">${esc(email)}</a>.</p>`
+    + `<p>Thanks,<br>${esc(name)}</p>`
+    + `<hr style="border:0;border-top:1px solid #ddd"><p style="font-size:12px;color:#888">Sent from the contact form on ${esc(page || 'rihaan.net')}</p></div>`;
+  const payload = JSON.stringify({ from: CONTACT_FROM, to: [CONTACT_TO], reply_to: email, subject: `${firstName} reached out about ${topicText} (rihaan.net)`, text, html });
   try {
     const r = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: 'Bearer ' + RESEND_API_KEY, 'Content-Type': 'application/json' }, body: payload });
     if (!r.ok) { console.error('contact: resend', r.status, (await r.text()).slice(0, 300)); json(502, { ok: false, error: 'Could not send right now. Please try again shortly.' }); return; }
