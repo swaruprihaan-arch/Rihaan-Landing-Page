@@ -12,7 +12,9 @@
     { slug: 'kathleen', title: 'Kathleen Treseder Campaign', desc: 'A student campaign site for Irvine City Council, District 6 — every claim links to a public source.', repo: 'https://github.com/swaruprihaan-arch/Kathleen_BioGlow' },
     { slug: 'mama-recipe-finder', title: 'Recipe Finder', desc: 'Search and discover recipes with an AI Chef assistant, pulling live data from TheMealDB.', repo: 'https://github.com/swaruprihaan-arch/Recipe-Finder' },
     { slug: 'workflow-pipeline', title: 'Brick Route', desc: 'An interactive, LEGO-themed walkthrough of an analysis workflow pipeline.' },
-    { slug: 'lego-brickforge', title: 'BrickForge', desc: '3D LEGO build instructions viewer powered by the Rebrickable API.', repo: 'https://github.com/swaruprihaan-arch/Lego_Bricks' }
+    { slug: 'lego-brickforge', title: 'BrickForge', desc: '3D LEGO build instructions viewer powered by the Rebrickable API.', repo: 'https://github.com/swaruprihaan-arch/Lego_Bricks' },
+    { slug: 'math', title: 'Math Lab', desc: 'Brick-themed math practice for kids — whole numbers, fractions, decimals, order of operations, word problems and K-8 grade-level math.', path: './math/', repo: 'https://github.com/swaruprihaan-arch/Math' },
+    { slug: 'mrs-hill-owl', title: 'Owls: Calm & Mystical Encyclopedia', desc: 'A species guide to owls with scrollable, fullscreen galleries.', path: './mrs-hill-owl/' }
   ];
   const PREVIEW_WIDTH = 1280;
 
@@ -65,7 +67,7 @@
     : null;
 
   function buildCard(project) {
-    const url = './projects/' + project.slug + '/index.html';
+    const url = project.path ? project.path : './projects/' + project.slug + '/index.html';
     const li = document.createElement('li');
     li.className = 'card project-card';
 

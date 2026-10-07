@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Owls • Calm & Mystical Encyclopedia</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0b264f; --navy-2:#103867;
+    --blue-hero-1:#0b264f; --blue-hero-2:#124d97; --blue-hero-3:#1969b7;
+    --gold:#d4af37; --sky:#6ecbf5; --leaf:#2e9b61;
+    --off-white:#f7f6f2; --surface:#ffffff; --ink:#1f2a35; --ink-soft:#3a4a5c;
+    --card-shadow:0 12px 28px rgba(0,0,0,.10);
+    --radius:18px; --radius-lg:22px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; color:var(--ink);
+    font-family:"Nunito", system-ui,-apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background:
+      radial-gradient(circle at 18% 12%, #fff7ea, transparent 60%),
+      radial-gradient(circle at 82% 10%, #eaf3ff, transparent 60%),
+      var(--off-white);
+    line-height:1.62;
+  }
+
+  /* Header */
+  .site-header{ position:sticky; top:0; z-index:60;
+    background:color-mix(in oklab, var(--off-white) 85%, #fff 15%);
+    border-bottom:1px solid rgba(0,0,0,.06); backdrop-filter:saturate(150%) blur(10px);
+  }
+  .container{width:min(1100px,92vw); margin-inline:auto}
+  .header-inner{ display:flex; align-items:center; justify-content:space-between; gap:.75rem; padding:.85rem 0 }
+  .brand{ display:flex; gap:.55rem; align-items:center; text-decoration:none; color:#142433; font-weight:800 }
+  .brand .owl{font-size:1.2rem}
+  .nav{display:flex; gap:.5rem; align-items:center; flex-wrap:wrap}
+  .nav a{
+    --bg:linear-gradient(135deg, #e9f2ff, #fff7da);
+    text-decoration:none; color:#1b2f40; font-weight:800; padding:.55rem .9rem;
+    border-radius:999px; border:1px solid rgba(0,0,0,.08); background:var(--bg);
+    box-shadow:0 8px 20px rgba(14,22,33,.08);
+  }
+  .nav a.is-active{ background:linear-gradient(135deg,#bfd9ff,#f1e1a1); box-shadow:0 10px 26px rgba(14,22,33,.12) }
+  .nav a:hover{ filter:brightness(.98) }
+
+  /* Hero */
+  .hero{
+    min-height:52vh; display:grid; place-items:center;
+    background:url("owl-flying-over-golden-wheat-field-landscape-at-sunset-photo.png") center/cover no-repeat;
+    border-bottom:6px solid var(--gold); position:relative; isolation:isolate;
+  }
+  .hero::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(10,20,30,.25), rgba(10,20,30,.35)) }
+  .hero-inner{ position:relative; z-index:1; text-align:center; color:#fff; text-shadow:0 10px 28px rgba(0,0,0,.35);
+    background:rgba(12,20,32,.35); padding:24px 28px; border-radius:16px; max-width:920px; transform: translateY(140px) }
+  .hero-title{ margin:.2rem 0 .6rem; font-size:clamp(1.9rem,2.2rem + 1vw,3rem); color:#ffeaa0 }
+  .hero-sub{margin:0}
+
+  /* Section shells */
+  .section{ padding:2.6rem 0 }
+  .title-bar{ display:flex; align-items:center; gap:.75rem; margin:0 0 .8rem; font-size:clamp(1.35rem,1.1rem + .9vw,2rem); color:#152a3a }
+  .title-bar .bar{ flex:0 0 6px; height:26px; border-radius:4px; background:var(--gold) }
+  .lead{ color:var(--ink-soft); margin:.1rem 0 1rem }
+
+  /* Shared guide styles */
+  .blue-hero{
+    background:
+      radial-gradient(1200px 280px at 50% -40%, rgba(255,255,255,.35), transparent 60%),
+      linear-gradient(180deg, var(--blue-hero-1) 0%, var(--blue-hero-2) 45%, var(--blue-hero-3) 100%);
+    color:#eaf5ff; border-radius:var(--radius-lg); padding:36px 18px 28px; text-align:center; box-shadow:var(--card-shadow);
+  }
+  .blue-hero .kicker{ text-transform:uppercase; letter-spacing:.14em; opacity:.9; font-weight:800 }
+  .blue-hero h1{ margin:.4rem 0 .6rem; font-weight:800; font-size:clamp(1.8rem,2vw + 1.4rem,3rem); color:#fff }
+  .blue-hero .sub{ max-width:760px; margin:0 auto; opacity:.98 }
+
+  .grid{ display:grid; gap:18px; grid-template-columns:repeat(12,1fr) }
+  .card{ grid-column:span 12; background:var(--surface); border-radius:var(--radius); box-shadow:var(--card-shadow); padding:20px; border:1px solid rgba(0,0,0,.06) }
+  .span-6{grid-column:span 12} .span-8{grid-column:span 12} .span-4{grid-column:span 12}
+  .span-3{grid-column:span 12} .span-9{grid-column:span 12}
+  @media (min-width:820px){
+    .span-6{grid-column:span 6} .span-8{grid-column:span 8} .span-4{grid-column:span 4}
+    .span-3{grid-column:span 3} .span-9{grid-column:span 9}
+  }
+  h2.guide{ font-size:clamp(1.3rem,1rem + .9vw,1.8rem); margin:0 0 10px; color:var(--navy) }
+  h3.guide{ margin:14px 0 8px; color:#143f76 }
+  .accent-bar{ height:6px; border-radius:999px; background:linear-gradient(90deg, var(--gold), var(--sky), var(--leaf)); margin:10px 0 14px }
+  ul{padding-left:18px; margin:.25rem 0 .75rem} li{margin:.25rem 0}
+
+  /* “At a glance” chips */
+  .chip{ background:#f1f8ff; border:1px solid #e3eef8; border-radius:12px; padding:10px 12px; font-weight:700; color:#214462 }
+  .chip-grid{ display:grid; gap:10px; grid-template-columns:repeat(3,1fr) }
+  @media (max-width:700px){ .chip-grid{ grid-template-columns:1fr 1fr } }
+
+  /* Tabs logic from index.html */
+  .species-panel{ display:none }
+  .species-panel.active{ display:block }
+
+  /* GALLERY (from index1.html) */
+  .gallery-wrap{ margin:18px 0 }
+  .gallery{
+    background:#1a2431; border-radius:16px; padding:14px; position:relative;
+    box-shadow:var(--card-shadow); border:1px solid rgba(255,255,255,.06);
+  }
+  .g-viewport{
+    overflow-x:auto; overflow-y:hidden; white-space:nowrap; scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch; border-radius:12px; padding-bottom:4px;
+  }
+  .g-track{ display:flex; gap:16px; align-items:stretch }
+  .g-item{ min-width: clamp(260px, 32vw, 520px);  position:relative; scroll-snap-align:center }
+  .g-img{
+    width:100%; height: clamp(180px, 24vw, 360px); object-fit:cover; display:block;
+    border-radius:14px; box-shadow:0 6px 18px rgba(0,0,0,.25)
+  }
+  .g-fs{
+    position:absolute; top:10px; right:10px; width:36px; height:36px; border-radius:10px; border:none; cursor:pointer;
+    background:rgba(10,14,18,.85); color:#fff; display:grid; place-items:center; font-size:18px;
+  }
+  .g-btn{
+    pointer-events:auto; border:none; width:46px; height:46px; border-radius:50%;
+    background:rgba(10,14,18,.65); color:#fff; font-size:22px; display:grid; place-items:center; cursor:pointer;
+  }
+  .g-btn:hover{ filter:brightness(1.1) }
+  .g-btn.prev{ position:absolute; left:10px; top:50%; transform:translateY(-50%) }
+  .g-btn.next{ position:absolute; right:10px; top:50%; transform:translateY(-50%) }
+
+  /* Lightbox */
+  .lightbox{ position:fixed; inset:0; background:rgba(0,0,0,.9); display:none; align-items:center; justify-content:center; z-index:1000 }
+  .lightbox.open{ display:flex }
+  .lb-inner{ position:relative; width:min(92vw,1200px) }
+  .lb-img{ width:100%; height:auto; border-radius:12px; }
+  .lb-close, .lb-prev, .lb-next, .lb-fs{
+    position:absolute; top:12px; width:42px; height:42px; border:none; border-radius:10px; background:rgba(12,16,20,.75); color:#fff; cursor:pointer;
+    display:grid; place-items:center; font-size:18px;
+  }
+  .lb-close{ right:12px } .lb-fs{ right:58px }
+  .lb-prev, .lb-next{ top:50%; transform:translateY(-50%); font-size:22px }
+  .lb-prev{ left:-60px } .lb-next{ right:-60px }
+  @media (max-width:800px){ .lb-prev{ left:6px } .lb-next{ right:6px } }
+
+  /* Contact / Footer */
+  .form-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:1rem }
+  .field label{ display:block; font-weight:800; margin-bottom:.35rem }
+  .control{ width:100%; border:1px solid #cfe0f3; border-radius:14px; padding:.85rem 1rem; background:#fff }
+  .actions{ display:flex; align-items:center; gap:1rem; margin-top:.8rem }
+  .btn{ display:inline-block; border:none; cursor:pointer; border-radius:999px; padding:.8rem 1.2rem; font-weight:800; color:#112233;
+        background:linear-gradient(135deg, #f1e1a1, #bfd9ff); box-shadow:var(--card-shadow) }
+  .btn:hover{ filter:brightness(.98) }
+  .feedback{ min-height:1.2rem; color:#27485f; font-weight:800 }
+  .site-footer{ background:color-mix(in oklab, var(--off-white) 88%, #e7f2ff 12%); border-top:1px solid rgba(0,0,0,.06) }
+  .footer-inner{ display:flex; align-items:center; justify-content:space-between; padding:1rem 0 }
+  .to-top{ text-decoration:none; font-weight:800; color:#1b2b36 } .to-top:hover{ text-decoration:underline }
+</style>
+</head>
+
+<body>
+<header class="site-header" id="top">
+  <div class="container header-inner">
+    <a href="#home" class="brand"><span class="owl" aria-hidden="true">🦉</span><span>Owls</span></a>
+    <nav class="nav" aria-label="Primary">
+      <a href="#about" id="nav-about" class="is-active">About</a>
+      <a href="#snowy" id="nav-snowy">Snowy Owl</a>
+      <a href="#barn"  id="nav-barn">American Barn Owl</a>
+      <a href="#gho"   id="nav-gho">Great Horned Owl</a>
+      <a href="#contact" id="nav-contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero" id="home" role="banner">
+  <div class="hero-inner">
+    <h1 class="hero-title">Quiet Forest. Watchful Eyes.</h1>
+    <p class="hero-sub">Unified species guides with scrollable, fullscreen galleries.</p>
+  </div>
+</section>
+
+<section class="section" id="about">
+  <div class="container">
+    <div class="title-bar"><span class="bar" aria-hidden="true"></span><h2>About Owls</h2></div>
+    <p class="lead">Owls are birds that are most active at night and hunt mice, insects, and other small animals.  ￼ They have big forward-facing eyes and amazing hearing; the ring of feathers on their face works like a sound catcher, and their soft-edged wings let them fly very quietly. They can twist their heads almost all the way around to look without moving their bodies. Owls live on every continent except Antarctica and come in many sizes, from tiny elf owls to very large eagle-owls. Their sharp beaks and claws help them grab food, and their patterned feathers help them hide among trees or snow. Fun fact: a group of owls is called a “parliament”.</p>
+  </div>
+</section>
+
+<!-- Snowy Owl -->
+<section class="section species-panel active" id="snowy" aria-labelledby="nav-snowy">
+  <div class="container">
+    <div class="blue-hero">
+      <div class="kicker">Arctic Bird Spotlight</div>
+      <h1>Snowy Owl <em>(Bubo scandiacus)</em></h1>
+      <p class="sub">A powerful white owl from the Arctic tundra. In some winters, it flies south and can be seen in open places like fields, beaches, and even big airports.</p>
+    </div>
+
+    <!-- GALLERY -->
+    <div class="gallery-wrap">
+      <div class="gallery" data-folder="snowy_owl">
+        <div class="g-viewport" tabindex="0" aria-label="Snowy Owl gallery">
+          <div class="g-track"></div>
+        </div>
+        <button class="g-btn prev" aria-label="Previous">❮</button>
+        <button class="g-btn next" aria-label="Next">❯</button>
+      </div>
+    </div>
+
+    <section class="grid" style="margin-top:18px">
+      <div class="card span-12">
+        <h2 class="guide">At a glance</h2>
+        <div class="accent-bar"></div>
+        <div class="chip-grid" role="list">
+          <div class="chip" role="listitem">Length: ~20–28 in</div>
+          <div class="chip" role="listitem">Wingspan: ~4.2–4.8 ft</div>
+          <div class="chip" role="listitem">Weight: ~3.5–6.5 lb</div>
+          <div class="chip" role="listitem">Color: mostly white</div>
+          <div class="chip" role="listitem">Active by day & night</div>
+          <div class="chip" role="listitem">Favorite prey: lemmings</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card span-6">
+        <h2 class="guide">Quick Facts</h2>
+        <div class="accent-bar"></div>
+        <p><strong>Where it lives:</strong> Summers on the Arctic tundra; in winter many move south to open fields, beaches, and coastal marshes.</p>
+        <p><strong>How it hunts:</strong> Watches from a high spot or hovers, then flies fast to seize prey with strong talons.</p>
+        <p><strong>What it eats:</strong> Mostly lemmings; also rabbits, voles, ducks, geese, and sometimes fish or carrion.</p>
+      </div>
+      <div class="card span-6">
+        <h2 class="guide">Why it’s special</h2>
+        <div class="accent-bar"></div>
+        <ul>
+          <li>Often active in daylight; males get whiter with age while females keep more dark spots.</li>
+          <li>Some winters bring wide-ranging <strong>irruptions</strong> far south.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card span-6">
+        <h2 class="guide">Look Closely: Identification</h2>
+        <div class="accent-bar"></div>
+        <ul>
+          <li><strong>Face & eyes:</strong> round head; bright yellow eyes.</li>
+          <li><strong>Plumage:</strong> mostly white; females retain more brown/gray barring.</li>
+          <li><strong>Size:</strong> large owl (~2 ft long; wingspan close to 5 ft).</li>
+          <li><strong>Feathering:</strong> thick feathers on legs and toes for cold.</li>
+        </ul>
+      </div>
+      <div class="card span-6">
+        <h2 class="guide">Field Tip</h2>
+        <div class="accent-bar"></div>
+        <p>From far away, a sitting Snowy Owl can resemble a small snow pile. Use binoculars and keep your distance.</p>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card span-6">
+        <h2 class="guide">Home & Range</h2>
+        <div class="accent-bar"></div>
+        <p>Nests on raised spots across the <strong>Arctic tundra</strong>. In winter many move to open land farther south (prairies, farm fields, beaches, even airports). Large southward movements (“irruptions”) are linked to prey cycles.</p>
+      </div>
+      <div class="card span-6">
+        <h2 class="guide">Nesting</h2>
+        <div class="accent-bar"></div>
+        <ul>
+          <li>Shallow scrape on the ground with wide visibility.</li>
+          <li>Open landscapes preferred for spotting danger and prey.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card span-6">
+        <h2 class="guide">Food & Hunting</h2>
+        <div class="accent-bar"></div>
+        <p><strong>Favorite food:</strong> lemmings; also rabbits, voles, ducks and geese when available.</p>
+        <p><strong>Hunting style:</strong> watchful perch-and-dash or brief hovering; keen vision and hearing—can take prey through snow cover.</p>
+      </div>
+      <div class="card span-6">
+        <h2 class="guide">Behavior</h2>
+        <div class="accent-bar"></div>
+        <ul>
+          <li>Active day or night; often dawn/dusk peaks.</li>
+          <li>Perches on dunes, mounds, fence posts, or ground.</li>
+          <li>Strong wingbeats built for long flights over open land and sea ice.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card span-6">
+        <h2 class="guide">Family Life</h2>
+        <div class="accent-bar"></div>
+        <ul>
+          <li><strong>Eggs:</strong> usually 3–11 (more in food-rich years).</li>
+          <li><strong>Incubation:</strong> ~1 month by the female; male delivers prey.</li>
+          <li><strong>Development:</strong> chicks depart the nest at 2–3 weeks, fly well at ~7 weeks, and remain dependent for weeks.</li>
+        </ul>
+      </div>
+      <div class="card span-6">
+        <h2 class="guide">Voices</h2>
+        <div class="accent-bar"></div>
+        <p>Generally quiet in winter; on breeding grounds gives deep hoots, croaks, whistles; chicks squeak then call loudly as they grow.</p>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card span-12">
+        <h2 class="guide">Conservation</h2>
+        <div class="accent-bar"></div>
+        <p>Facing change in Arctic habitats and fluctuating prey cycles. Protect wide, open habitats; reduce disturbance; observe from a distance.</p>
+      </div>
+    </section>
+  </div>
+</section>
+
+<!-- American Barn Owl -->
+<section class="section species-panel" id="barn" aria-labelledby="nav-barn">
+  <div class="container">
+    <div class="blue-hero">
+      <div class="kicker">Kid-Friendly Nature Guide</div>
+      <h1>American Barn Owl <em>(Tyto furcata)</em></h1>
+      <p class="sub">A pale, heart-faced night hunter that helps farmers by eating mice and voles. What it looks like, where it lives, how it hunts, and how you can help.</p>
+    </div>
+
+    <!-- GALLERY -->
+    <div class="gallery-wrap">
+      <div class="gallery" data-folder="barn_owl">
+        <div class="g-viewport" tabindex="0" aria-label="American Barn Owl gallery">
+          <div class="g-track"></div>
+        </div>
+        <button class="g-btn prev" aria-label="Previous">❮</button>
+        <button class="g-btn next" aria-label="Next">❯</button>
+      </div>
+    </div>
+
+    <section class="grid" style="margin-top:18px">
+      <div class="card span-12">
+        <h2 class="guide">At a glance</h2>
+        <div class="accent-bar"></div>
+        <div class="chip-grid" role="list">
+          <div class="chip" role="listitem">Length: ~13–16 in</div>
+          <div class="chip" role="listitem">Wingspan: ~3.3–4.1 ft</div>
+          <div class="chip" role="listitem">Weight: ~1.0–1.6 lb</div>
+          <div class="chip" role="listitem">Color: pale buff & gray</div>
+          <div class="chip" role="listitem">Active mostly at night</div>
+          <div class="chip" role="listitem">Favorite prey: voles & mice</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card span-6">
+        <h2 class="guide">Quick Facts</h2>
+        <div class="accent-bar"></div>
+        <p><strong>Where it lives:</strong> Open areas—farms, fields, marsh edges; roosts and nests in quiet buildings, tree cavities, cliffs, and nest boxes.</p>
+        <p><strong>How it hunts:</strong> Flies low over fields, listening; drops quickly on the faintest rustle.</p>
+        <p><strong>What it eats:</strong> Mostly small mammals (voles, mice); occasionally shrews and small rats.</p>
+      </div>
+      <div class="card span-6">
+        <h2 class="guide">Why it’s special</h2>
+        <div class="accent-bar"></div>
+        <ul>
+          <li>Legendary <strong>silent flight</strong> from fringed feathers.</li>
+          <li>Extreme hearing from slightly offset ears and facial disc.</li>
+          <li>Valuable <strong>natural pest control</strong> for farms and orchards.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card span-6">
+        <h2 class="guide">Look Closely: Identification</h2>
+        <div class="accent-bar"></div>
+        <ul>
+          <li><strong>Face & eyes:</strong> white, heart-shaped face; dark eyes; long legs.</li>
+          <li><strong>Plumage:</strong> back pale brown to gray; underparts white to warm buff with fine spots.</li>
+          <li><strong>Size:</strong> medium owl; short, squarish tail; long broad wings.</li>
+        </ul>
+      </div>
+      <div class="card span-6">
+        <h2 class="guide">Field Tip</h2>
+        <div class="accent-bar"></div>
+        <p>At night a barn owl looks ghost-pale and <em>doesn’t hoot</em>—it gives a long, harsh <strong>scream</strong>. Watch for a buoyant, moth-like flight.</p>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card span-6">
+        <h2 class="guide">Home & Range</h2>
+        <div class="accent-bar"></div>
+        <p>Found across most of the Americas (including Hawai‘i). Prefers open country with grassy edges; uses barns, silos, bridges, or nest boxes for shelter.</p>
+      </div>
+      <div class="card span-6">
+        <h2 class="guide">Nesting</h2>
+        <div class="accent-bar"></div>
+        <ul>
+          <li>Clutch usually <strong>3–8</strong>, laid every 2–3 days; incubation ~30 days.</li>
+          <li>Young fledge ~55–65 days; parents both feed the brood.</li>
+          <li>Nests are simple—often pellets and a shallow depression.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card span-6">
+        <h2 class="guide">Food & Hunting</h2>
+        <div class="accent-bar"></div>
+        <p><strong>Diet:</strong> chiefly voles and mice; prey swallowed whole and later egested as dry <strong>pellets</strong>.</p>
+        <p><strong>Method:</strong> quartering flights a few meters above ground; can take prey by <strong>sound alone</strong>.</p>
+      </div>
+      <div class="card span-6">
+        <h2 class="guide">Behavior</h2>
+        <div class="accent-bar"></div>
+        <ul>
+          <li>Strongly nocturnal; peak activity around dusk and dawn.</li>
+          <li>Often wanders widely when young before settling.</li>
+          <li>Roosts in cavities and quiet structures by day.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card span-6">
+        <h2 class="guide">Family Life</h2>
+        <div class="accent-bar"></div>
+        <ul>
+          <li>Monogamous pairs; male delivers most prey during incubation.</li>
+          <li>Asynchronous hatching can produce different-sized chicks in one brood.</li>
+        </ul>
+      </div>
+      <div class="card span-6">
+        <h2 class="guide">Voices</h2>
+        <div class="accent-bar"></div>
+        <ul>
+          <li>Long, loud <strong>scream</strong>.</li>
+          <li><strong>Hisses</strong>, grunts, and beak <strong>clicks</strong> when alarmed.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card span-12">
+        <h2 class="guide">Conservation</h2>
+        <div class="accent-bar"></div>
+        <ul>
+          <li>Avoid second-generation <strong>rodenticides</strong> (secondary poisoning risk).</li>
+          <li>Provide safe <strong>nest boxes</strong> away from busy roads.</li>
+          <li>Maintain grassy margins and field edges for hunting.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</section>
+
+<!-- Great Horned Owl -->
+<section class="section species-panel" id="gho" aria-labelledby="nav-gho">
+  <div class="container">
+    <div class="blue-hero">
+      <div class="kicker">Widespread Raptor Spotlight</div>
+      <h1>Great Horned Owl <em>(Bubo virginianus)</em></h1>
+      <p class="sub">A powerful, adaptable predator native to the Americas. Recognizable by bold ear tufts, yellow eyes, deep hoots, and formidable talons.</p>
+    </div>
+
+    <!-- GALLERY -->
+    <div class="gallery-wrap">
+      <div class="gallery" data-folder="great_owl">
+        <div class="g-viewport" tabindex="0" aria-label="Great Horned Owl gallery">
+          <div class="g-track"></div>
+        </div>
+        <button class="g-btn prev" aria-label="Previous">❮</button>
+        <button class="g-btn next" aria-label="Next">❯</button>
+      </div>
+    </div>
+
+    <!-- At a glance -->
+    <section class="grid" style="margin-top:18px">
+      <div class="card span-12">
+        <h2 class="guide">At a glance</h2>
+        <div class="accent-bar"></div>
+        <div class="chip-grid" role="list">
+          <div class="chip" role="listitem">Length: ~17–25 in</div>
+          <div class="chip" role="listitem">Wingspan: ~3–5 ft</div>
+          <div class="chip" role="listitem">Weight: ~2.7–3.5 lb (♀ larger)</div>
+          <div class="chip" role="listitem">Color: mottled brown/gray; white throat</div>
+          <div class="chip" role="listitem">Active mostly at night</div>
+          <div class="chip" role="listitem">Favorite prey: rabbits, mice & voles</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Facts + Why it's special -->
+    <section class="grid">
+      <div class="card span-6">
+        <h2 class="guide">Quick Facts</h2>
+        <div class="accent-bar"></div>
+        <p><strong>Where it lives:</strong> Throughout most of North and South America, from subarctic forests to deserts, grasslands, wetlands, mountains, and some parks in towns.</p>
+        <p><strong>How it hunts:</strong> Perch-and-pounce; short, silent flights; can locate prey by sound alone.</p>
+        <p><strong>What it eats:</strong> Mainly mammals (rabbits/hares, rats, mice, voles), also birds, reptiles, amphibians, and invertebrates; among the few regular skunk predators.</p>
+      </div>
+      <div class="card span-6">
+        <h2 class="guide">Why it’s special</h2>
+        <div class="accent-bar"></div>
+        <ul>
+          <li>Earliest nesting of any large North American raptor—often eggs in winter.</li>
+          <li>Remarkable grip strength (≈300 psi) and near-silent flight surfaces.</li>
+          <li>Extremely adaptable; one of the most widely distributed true owls in the Americas.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Look closely + Field Tip -->
+    <section class="grid">
+      <div class="card span-6">
+        <h2 class="guide">Look Closely: Identification</h2>
+        <div class="accent-bar"></div>
+        <ul>
+          <li><strong>Face & eyes:</strong> large yellow eyes; bold facial disc with dark brackets; prominent feather “horns” (plumicorns).</li>
+          <li><strong>Plumage:</strong> cryptic mottled brown/gray; white throat patch that may flare during calling.</li>
+          <li><strong>Build:</strong> heavy, barrel-chested body; broad wings; feathered legs and feet.</li>
+        </ul>
+      </div>
+      <div class="card span-6">
+        <h2 class="guide">Field Tip</h2>
+        <div class="accent-bar"></div>
+        <p>Listen for a deep <em>hoo-hoo-hoo hoo hoo</em> (female slightly higher, rising at the end). Daytime roosts may be revealed by mobs of crows.</p>
+      </div>
+    </section>
+
+    <!-- Home & Range + Nesting -->
+    <section class="grid">
+      <div class="card span-6">
+        <h2 class="guide">Home & Range</h2>
+        <div class="accent-bar"></div>
+        <p>Breeds from northern Canada and Alaska through the U.S., Central America, and much of South America, using edges where woods meet open hunting grounds; occurs from sea level to &gt;10,000 ft in the Andes.</p>
+      </div>
+      <div class="card span-6">
+        <h2 class="guide">Nesting</h2>
+        <div class="accent-bar"></div>
+        <ul>
+          <li>Uses abandoned stick nests, cavities, cliffs, or structures rather than building new nests.</li>
+          <li>Clutch <strong>1–5 eggs</strong> (typically 2); incubation about <strong>30–37 days</strong>.</li>
+          <li>Young leave the nest at <strong>6–9 weeks</strong>, fly at ~9–10 weeks; often remain with parents until autumn.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Food & Hunting + Behavior -->
+    <section class="grid">
+      <div class="card span-6">
+        <h2 class="guide">Food & Hunting</h2>
+        <div class="accent-bar"></div>
+        <p><strong>Diet breadth:</strong> &gt;500 prey species recorded across the Americas; mammals dominate. Pellets large (≈3–4 in long).</p>
+        <p><strong>Method:</strong> watch from perch; swift pounce; can carry or cache large prey; often dismembers large items.</p>
+      </div>
+      <div class="card span-6">
+        <h2 class="guide">Behavior</h2>
+        <div class="accent-bar"></div>
+        <ul>
+          <li>Mostly nocturnal; roosts in dense trees, hollows, or rocky niches.</li>
+          <li>Pairs defend territories year-round; unmated “floaters” linger along borders.</li>
+          <li>Crows frequently mob roosting birds during the day.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Family Life + Voices -->
+    <section class="grid">
+      <div class="card span-6">
+        <h2 class="guide">Family Life</h2>
+        <div class="accent-bar"></div>
+        <ul>
+          <li>Female larger and does most incubation; male supplies prey.</li>
+          <li>Young vocalize with hisses/screeches; remain dependent for weeks after first flights.</li>
+        </ul>
+      </div>
+      <div class="card span-6">
+        <h2 class="guide">Voices</h2>
+        <div class="accent-bar"></div>
+        <p>Deep, resonant hoots in 4–5 syllables; also growls, screeches, and beak-clicks—especially at the nest or during disputes.</p>
+      </div>
+    </section>
+
+    <!-- Conservation -->
+    <section class="grid">
+      <div class="card span-12">
+        <h2 class="guide">Conservation</h2>
+        <div class="accent-bar"></div>
+        <ul>
+          <li>Status: <strong>Least Concern</strong> globally due to broad range and adaptability.</li>
+          <li>Local risks: habitat loss/fragmentation, vehicle collisions, pesticides; disease (e.g., West Nile virus) reported in some areas.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</section>
+
+<!-- Contact -->
+<section class="section" id="contact">
+  <div class="container">
+    <div class="title-bar"><span class="bar" aria-hidden="true"></span><h2>Contact</h2></div>
+    <p class="lead">Questions the guides didn’t answer? Send a note.</p>
+    <form id="contact-form" class="form-grid" novalidate>
+      <div class="field">
+        <label for="name">Name</label>
+        <input id="name" name="name" class="control" type="text" required>
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" class="control" type="email" required>
+      </div>
+      <div class="field" style="grid-column:1/-1">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" class="control" rows="6" required></textarea>
+      </div>
+      <div class="actions" style="grid-column:1/-1">
+        <button class="btn" type="submit">Send</button>
+        <span id="feedback" class="feedback" aria-live="polite"></span>
+      </div>
+    </form>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p>&copy; <span id="year"></span> Owls • Site developed by Rihaan Swarup, Grade-4, Vista Verde</p>
+    <a href="#top" class="to-top">Back to top ↑</a>
+  </div>
+</footer>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" aria-modal="true" role="dialog">
+  <div class="lb-inner" id="lbInner">
+    <img class="lb-img" id="lbImg" alt="Full-size owl photo"/>
+    <button class="lb-close" id="lbClose" aria-label="Close">✕</button>
+    <button class="lb-fs" id="lbFs" aria-label="Fullscreen">⛶</button>
+    <button class="lb-prev" id="lbPrev" aria-label="Previous">❮</button>
+    <button class="lb-next" id="lbNext" aria-label="Next">❯</button>
+  </div>
+</div>
+
+<script>
+  /* Year */
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  /* Tabs */
+  const navAbout=document.getElementById('nav-about');
+  const navSnowy=document.getElementById('nav-snowy');
+  const navBarn =document.getElementById('nav-barn');
+  const navGHO  =document.getElementById('nav-gho');
+  const navContact=document.getElementById('nav-contact');
+  const panels={ snowy:document.getElementById('snowy'), barn:document.getElementById('barn'), gho:document.getElementById('gho') };
+  function setActive(link){ document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('is-active')); link.classList.add('is-active'); }
+  function showPanel(which){ Object.values(panels).forEach(el=>el.classList.remove('active')); panels[which].classList.add('active'); panels[which].scrollIntoView({behavior:'smooth', block:'start'}); }
+  navAbout.addEventListener('click',()=>setActive(navAbout));
+  navContact.addEventListener('click',()=>setActive(navContact));
+  navSnowy.addEventListener('click',()=>{ setActive(navSnowy); showPanel('snowy'); });
+  navBarn .addEventListener('click',()=>{ setActive(navBarn ); showPanel('barn');  });
+  navGHO  .addEventListener('click',()=>{ setActive(navGHO  ); showPanel('gho');   });
+
+  /* Contact mailto */
+  (function(){
+    const form=document.getElementById('contact-form'); const fb=document.getElementById('feedback');
+    form.addEventListener('submit',(e)=>{
+      e.preventDefault();
+      const name=document.getElementById('name').value.trim();
+      const email=document.getElementById('email').value.trim();
+      const msg=document.getElementById('message').value.trim();
+      if(!name||!email||!msg){ fb.textContent='Please complete all fields.'; return; }
+      const subject=`Owl Site Question from ${name}`;
+      const body=`${msg}\n\nFrom: ${name} <${email}>`;
+      window.location.href=`mailto:swarup.bio@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      fb.textContent='Opening your email app… If nothing appears, email swarup.bio@gmail.com.'; form.reset();
+    });
+  })();
+
+  /** ------- GALLERY ENGINE from index1.html -------- */
+  // Helper: try JSON manifest first; else parse directory index HTML to list image files (.png/.webp)
+  async function listImages(folder){
+    const exts=['.png','.webp'];
+    const okExt = (p)=>exts.some(e=>p.toLowerCase().endsWith(e));
+    // 1) manifest
+    try{
+      const r = await fetch(`${folder}/gallery.json`, {cache:'no-store'});
+      if(r.ok){
+        const j = await r.json();
+        if(Array.isArray(j.images)) return j.images.filter(okExt).map(n => `${folder}/${n}`);
+      }
+    }catch(_e){}
+    // 2) directory index (Apache/Nginx autoindex)
+    try{
+      const res = await fetch(`${folder}/`, {cache:'no-store'});
+      if(res.ok){
+        const html = await res.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const links = Array.from(doc.querySelectorAll('a'))
+          .map(a=>a.getAttribute('href')||'')
+          .filter(h=>okExt(h) && !h.includes('?') && !h.startsWith('../'));
+        const urls = links.map(h => h.startsWith('http') ? h : `${folder}/${h}`);
+        return Array.from(new Set(urls));
+      }
+    }catch(e){
+      console.warn('Directory listing unavailable for', folder, e);
+    }
+    return [];
+  }
+
+  // Build one gallery
+  async function buildGallery(rootEl){
+    const folder = rootEl.dataset.folder;
+    let images = await listImages(folder);
+    const viewport = rootEl.querySelector('.g-viewport');
+    const track    = rootEl.querySelector('.g-track');
+    const prevBtn  = rootEl.querySelector('.prev');
+    const nextBtn  = rootEl.querySelector('.next');
+
+    if(!images.length){
+      track.innerHTML = `<div style="color:#cfe0f3; padding:10px 6px">Place .png/.webp images in <code>${folder}/</code>. If your host blocks directory listings, add <code>gallery.json</code> with {"images":[...]}</div>`;
+      prevBtn.style.display=nextBtn.style.display='none';
+      return;
+    }
+
+    // Keep a base array for lightbox; create 3 segments for infinite scroll illusion
+    const base = images.slice();
+    images = base.concat(base, base);
+
+    function createItem(src, idx){
+      const item=document.createElement('div'); item.className='g-item';
+      const img=document.createElement('img'); img.className='g-img'; img.loading='lazy'; img.src=src; img.alt='Owl photo';
+      const fs=document.createElement('button'); fs.className='g-fs'; fs.innerText='⛶'; fs.title='Open';
+      fs.addEventListener('click', ()=> openLightbox(base, idx % base.length));
+      img.addEventListener('click', ()=> openLightbox(base, idx % base.length));
+      item.append(img, fs);
+      return item;
+    }
+
+    images.forEach((src, i)=> track.appendChild(createItem(src, i)));
+
+    // Start centered on middle segment
+    const scrollToMiddle = ()=>{
+      const segmentWidth = track.scrollWidth / 3;
+      viewport.scrollLeft = segmentWidth + 2;
+    };
+    requestAnimationFrame(scrollToMiddle);
+    window.addEventListener('resize', ()=> setTimeout(scrollToMiddle, 250));
+
+    // Infinite scroll maintenance
+    function maintainLoop(){
+      const total = track.scrollWidth;
+      const oneThird = total/3;
+      if(viewport.scrollLeft < oneThird*0.33){
+        viewport.scrollLeft += oneThird;
+      }else if(viewport.scrollLeft > oneThird*1.67){
+        viewport.scrollLeft -= oneThird;
+      }
+    }
+    viewport.addEventListener('scroll', ()=> { clearTimeout(viewport._t); viewport._t=setTimeout(maintainLoop, 80); });
+
+    // Nav buttons scroll by ~one viewport width
+    const step = ()=> Math.max(200, Math.floor(viewport.clientWidth*0.9));
+    prevBtn.addEventListener('click', ()=> viewport.scrollBy({left:-step(), behavior:'smooth'}));
+    nextBtn.addEventListener('click', ()=> viewport.scrollBy({left: step(), behavior:'smooth'}));
+
+    // Keyboard support
+    viewport.addEventListener('keydown',(e)=>{
+      if(e.key==='ArrowRight') nextBtn.click();
+      if(e.key==='ArrowLeft')  prevBtn.click();
+    });
+  }
+
+  // Initialize all galleries
+  document.querySelectorAll('.gallery').forEach(g => buildGallery(g));
+
+  /* -------- Lightbox (enlarge + fullscreen) ---------- */
+  const lb   = document.getElementById('lightbox');
+  const lbImg= document.getElementById('lbImg');
+  const lbPrev=document.getElementById('lbPrev');
+  const lbNext=document.getElementById('lbNext');
+  const lbClose=document.getElementById('lbClose');
+  const lbFs=document.getElementById('lbFs');
+  const lbInner=document.getElementById('lbInner');
+  let lbList=[], lbIndex=0;
+
+  function openLightbox(list, index){
+    lbList=list; lbIndex=index;
+    updateLb();
+    lb.classList.add('open');
+  }
+  function updateLb(){
+    if(!lbList.length) return;
+    lbImg.src = lbList[(lbIndex+lbList.length)%lbList.length];
+  }
+  function closeLb(){ lb.classList.remove('open'); document.exitFullscreen?.(); }
+  function prevLb(){ lbIndex=(lbIndex-1+lbList.length)%lbList.length; updateLb(); }
+  function nextLb(){ lbIndex=(lbIndex+1)%lbList.length; updateLb(); }
+
+  lbPrev.onclick=prevLb; lbNext.onclick=nextLb; lbClose.onclick=closeLb;
+  lb.addEventListener('click', (e)=>{ if(e.target===lb) closeLb(); });
+  document.addEventListener('keydown', (e)=>{
+    if(!lb.classList.contains('open')) return;
+    if(e.key==='Escape') closeLb();
+    if(e.key==='ArrowLeft') prevLb();
+    if(e.key==='ArrowRight') nextLb();
+  });
+  lbFs.addEventListener('click', ()=>{ if(!document.fullscreenElement){ lbInner.requestFullscreen?.(); } else { document.exitFullscreen?.(); } });
+</script>
+</body>
+</html>
