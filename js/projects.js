@@ -48,10 +48,103 @@
     else els.status.removeAttribute('data-tone');
   }
 
-  function openProject(url) {
-    const win = window.open(url, '_blank', 'noopener');
-    if (!win) setStatus('The new tab may have been blocked. Allow pop-ups for this page and try again.', 'error');
+  function absUrl(url) {
+    return new URL(url.replace(/index\.html$/, ''), window.location.href).href;
   }
+
+  function copyLink(url, btn) {
+    const href = absUrl(url);
+    const done = (ok) => {
+      if (!btn) return;
+      const label = btn.getAttribute('data-label') || btn.textContent;
+      btn.setAttribute('data-label', label);
+      btn.textContent = ok ? 'Copied!' : 'Copy failed';
+      clearTimeout(btn._t);
+      btn._t = setTimeout(() => { btn.textContent = label; }, 1600);
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(href).then(() => done(true), () => done(fallbackCopy(href)));
+    } else {
+      done(fallbackCopy(href));
+    }
+  }
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    ta.remove();
+    return ok;
+  }
+
+  function makeBtn(tag, cls, text) {
+    const b = document.createElement(tag);
+    b.className = 'project-card__btn' + (cls ? ' ' + cls : '');
+    b.textContent = text;
+    if (tag === 'button') b.type = 'button';
+    return b;
+  }
+
+  /* ---------- Preview modal: full-size, interactive, stays on this page ---------- */
+  const modal = (function buildModal() {
+    const root = document.createElement('div');
+    root.className = 'preview-modal';
+    root.setAttribute('role', 'dialog');
+    root.setAttribute('aria-modal', 'true');
+    root.setAttribute('aria-labelledby', 'preview-modal-title');
+    root.hidden = true;
+    root.innerHTML =
+      '<div class="preview-modal__scrim" data-close></div>' +
+      '<div class="preview-modal__panel">' +
+        '<div class="preview-modal__bar">' +
+          '<h2 class="preview-modal__title" id="preview-modal-title"></h2>' +
+          '<div class="preview-modal__actions"></div>' +
+          '<button type="button" class="preview-modal__close" aria-label="Close preview" data-close>&times;</button>' +
+        '</div>' +
+        '<div class="preview-modal__stage"><iframe class="preview-modal__frame" title="Website preview" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"></iframe></div>' +
+        '<p class="preview-modal__summary"></p>' +
+      '</div>';
+    document.body.appendChild(root);
+    const title = root.querySelector('.preview-modal__title');
+    const actions = root.querySelector('.preview-modal__actions');
+    const frame = root.querySelector('.preview-modal__frame');
+    const summary = root.querySelector('.preview-modal__summary');
+    let lastFocus = null;
+
+    function close() {
+      if (root.hidden) return;
+      root.hidden = true;
+      frame.src = 'about:blank';
+      document.documentElement.classList.remove('preview-open');
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+    root.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) close(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+
+    function open(project, url) {
+      lastFocus = document.activeElement;
+      title.textContent = project.title;
+      summary.textContent = project.desc || '';
+      actions.textContent = '';
+      const tab = makeBtn('a', 'project-card__btn--primary', 'Open in new tab');
+      tab.href = url; tab.target = '_blank'; tab.rel = 'noopener';
+      const copy = makeBtn('button', '', 'Copy link');
+      copy.addEventListener('click', () => copyLink(url, copy));
+      actions.appendChild(tab);
+      actions.appendChild(copy);
+      frame.src = url;
+      root.hidden = false;
+      document.documentElement.classList.add('preview-open');
+      root.querySelector('.preview-modal__close').focus();
+    }
+    return { open, close };
+  })();
 
   /* Previews only start loading when the card is near the viewport: six live
      sites at once is too heavy for phones. */
@@ -92,7 +185,13 @@
     badge.className = 'project-card__badge';
     badge.textContent = 'Live preview';
     preview.appendChild(badge);
-    preview.addEventListener('click', () => openProject(url));
+    preview.setAttribute('role', 'button');
+    preview.setAttribute('tabindex', '0');
+    preview.setAttribute('aria-label', 'Preview ' + project.title);
+    preview.addEventListener('click', () => modal.open(project, url));
+    preview.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); modal.open(project, url); }
+    });
 
     const body = document.createElement('div');
     body.className = 'project-card__body';
@@ -104,17 +203,19 @@
     meta.textContent = project.desc || '';
     const actions = document.createElement('div');
     actions.className = 'project-card__actions';
-    const openBtn = document.createElement('a');
-    openBtn.className = 'project-card__btn project-card__btn--primary';
-    openBtn.textContent = 'Open site';
-    openBtn.href = url;
-    openBtn.target = '_blank';
-    openBtn.rel = 'noopener';
-    actions.appendChild(openBtn);
+    const previewBtn = makeBtn('button', 'project-card__btn--primary', 'Preview');
+    previewBtn.addEventListener('click', () => modal.open(project, url));
+    actions.appendChild(previewBtn);
+    const tabBtn = makeBtn('a', '', 'Open in new tab');
+    tabBtn.href = url;
+    tabBtn.target = '_blank';
+    tabBtn.rel = 'noopener';
+    actions.appendChild(tabBtn);
+    const copyBtn = makeBtn('button', '', 'Copy link');
+    copyBtn.addEventListener('click', () => copyLink(url, copyBtn));
+    actions.appendChild(copyBtn);
     if (project.repo) {
-      const repoBtn = document.createElement('a');
-      repoBtn.className = 'project-card__btn';
-      repoBtn.textContent = 'Source';
+      const repoBtn = makeBtn('a', '', 'Source');
       repoBtn.href = project.repo;
       repoBtn.target = '_blank';
       repoBtn.rel = 'noopener';
