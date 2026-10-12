@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hindi → English Translator</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f4f1ea; color: #1d1d1d; font-size: 26px; line-height: 1.4;
+    min-height: 100vh;
+  }
+  main { max-width: 1100px; margin: 0 auto; padding: 40px 28px 120px; }
+  h1 { font-size: 64px; margin: 0 0 8px; text-align: center; }
+  .sub { text-align: center; font-size: 28px; color: #555; margin: 0 0 40px; }
+  .label { font-size: 32px; font-weight: 700; margin: 36px 0 14px; }
+  .row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .chip {
+    flex: 1 1 200px; font-size: 28px; padding: 26px 18px; border-radius: 20px;
+    border: 4px solid #c9c2b2; background: #fff; cursor: pointer; font-weight: 600;
+  }
+  .chip.on { background: #1f5eff; border-color: #1f5eff; color: #fff; }
+  .chip small { display: block; font-size: 20px; font-weight: 400; opacity: .8; margin-top: 4px; }
+  .big-input {
+    width: 100%; font-size: 32px; padding: 26px; border-radius: 20px;
+    border: 4px solid #c9c2b2; background: #fff; font-family: inherit;
+  }
+  .big-input:focus { outline: none; border-color: #1f5eff; }
+  #frame {
+    position: fixed; inset: 0; border: 10px dashed #9a927f; pointer-events: none; z-index: 30;
+  }
+  body.dragging #frame { border-color: #1f5eff; border-style: solid; }
+  #keyBox { display: none; margin-bottom: 30px; }
+  .drop {
+    margin-top: 40px; border: none; border-radius: 30px; background: #fff;
+    padding: 70px 20px; text-align: center; cursor: pointer; font-size: 36px; font-weight: 700;
+  }
+  .drop span { display: block; font-size: 24px; font-weight: 400; color: #666; margin-top: 10px; }
+  #files { margin-top: 24px; }
+  .file {
+    display: flex; align-items: center; gap: 18px; background: #fff; border-radius: 18px;
+    padding: 16px 20px; margin-bottom: 12px; font-size: 26px;
+  }
+  .file img { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; }
+  .file .ic { width: 80px; height: 80px; display: grid; place-items: center; font-size: 44px; background: #eee; border-radius: 10px; }
+  .file .nm { flex: 1; word-break: break-all; }
+  .file button { font-size: 26px; padding: 12px 22px; border-radius: 14px; border: none; background: #eee; cursor: pointer; }
+  #go {
+    width: 100%; margin-top: 30px; font-size: 44px; font-weight: 800; padding: 36px;
+    border: none; border-radius: 26px; background: #15a34a; color: #fff; cursor: pointer;
+  }
+  #go:disabled { background: #b8b8b8; cursor: not-allowed; }
+  #confirm {
+    position: fixed; inset: 0; background: rgba(0,0,0,.55); display: none;
+    align-items: center; justify-content: center; z-index: 50; padding: 20px;
+  }
+  #confirm .box { background: #fff; border-radius: 28px; padding: 44px; max-width: 760px; width: 100%; text-align: center; }
+  #confirm h2 { font-size: 42px; margin: 0 0 18px; }
+  #confirm p { font-size: 28px; margin: 0 0 30px; }
+  #confirm .row button { flex: 1; font-size: 34px; font-weight: 800; padding: 28px; border-radius: 22px; border: none; cursor: pointer; }
+  #yes { background: #15a34a; color: #fff; }
+  #no { background: #e5e5e5; }
+  #results { margin-top: 44px; }
+  .res { background: #fff; border-radius: 22px; padding: 28px; margin-bottom: 24px; border-left: 12px solid #1f5eff; }
+  .res h3 { margin: 0 0 14px; font-size: 30px; word-break: break-all; }
+  .res .txt { white-space: pre-wrap; font-size: 28px; }
+  .res.err { border-left-color: #d92d20; }
+  .res.wait { border-left-color: #f5a400; }
+  .res .acts { margin-top: 18px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .res .acts button { font-size: 24px; padding: 14px 24px; border-radius: 14px; border: none; background: #eee; cursor: pointer; }
+  .linkbtn { flex: 0 0 auto; font-size: 32px; font-weight: 800; padding: 0 34px; min-height: 96px; border: none; border-radius: 20px; background: #15a34a; color: #fff; cursor: pointer; }
+  .dl {
+    display: block; text-align: center; font-size: 40px; font-weight: 800; padding: 34px; margin: 10px 0 20px;
+    background: #15a34a; color: #fff; border-radius: 24px; text-decoration: none;
+  }
+  .dl:hover { background: #128a3f; }
+  .res.done { border-left: none; padding: 20px; }
+  .fname { text-align: center; font-size: 20px; color: #777; word-break: break-all; }
+  .order { font-size: 22px; color: #555; margin-bottom: 18px; }
+  #overlay {
+    position: fixed; inset: 0; background: rgba(31,94,255,.88); color: #fff; z-index: 40;
+    display: none; align-items: center; justify-content: center; font-size: 72px; font-weight: 800;
+    text-align: center; pointer-events: none;
+  }
+  body.dragging .drop { background: #1f5eff; color: #fff; }
+  body.dragging .drop span { color: #fff; }
+</style>
+</head>
+<body>
+<div id="frame"></div>
+
+<main>
+  <h1>Hindi → English</h1>
+  <p class="sub">Drop files or images anywhere on the screen</p>
+  <div id="keyBox"><div class="label">API key</div><input id="keyInput" class="big-input" type="password" placeholder="Paste your Anthropic API key (saved only in this browser)"></div>
+
+  <div class="label">1. Topic</div>
+  <input id="topic" class="big-input" placeholder="Type the topic (for example: medical report, wedding letter)…">
+
+  <div class="label">2. Style</div>
+  <div class="row">
+    <button class="chip on" data-style="verbatim">Verbatim<small>Word-for-word, exact</small></button>
+    <button class="chip" data-style="natural">Not verbatim<small>Natural, easy English</small></button>
+  </div>
+
+  <div class="label">3. Paste a link <small style="font-weight:400;color:#666">(no topic needed)</small></div>
+  <div class="row">
+    <input id="link" class="big-input" style="flex:1 1 500px" placeholder="https://…">
+    <button id="goLink" class="linkbtn">Translate link</button>
+  </div>
+
+  <div class="label">4. Or files <small style="font-weight:400;color:#666">(type a topic first)</small></div>
+  <div class="drop" id="pick">Click or drop files here<span>Images (JPG, PNG, WEBP, GIF), PDF, or text files — many at once</span></div>
+  <input type="file" id="input" multiple accept="image/*,.pdf,.txt,.md,.csv,.html,.json,text/*" hidden>
+  <div id="files"></div>
+
+  <button id="go" disabled>Translate</button>
+
+  <div id="results"></div>
+</main>
+
+<div id="confirm">
+  <div class="box">
+    <h2>Translate now?</h2>
+    <p id="confirmText"></p>
+    <div class="row">
+      <button id="no">Cancel</button>
+      <button id="yes">Yes, translate</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="config.js"></script>
+<script>
+const CFG = window.TRANSLATOR_CONFIG || {};
+if (!CFG.apiKey) {
+  CFG.apiKey = localStorage.getItem("anthropicKey") || "";
+  if (!CFG.apiKey) {
+    document.getElementById("keyBox").style.display = "block";
+    document.getElementById("keyInput").addEventListener("input", e => {
+      CFG.apiKey = e.target.value.trim(); localStorage.setItem("anthropicKey", CFG.apiKey);
+    });
+  }
+}
+let style = "verbatim", files = [];
+
+const $ = s => document.querySelector(s);
+document.querySelectorAll("[data-style]").forEach(b => b.onclick = () => {
+  style = b.dataset.style;
+  document.querySelectorAll("[data-style]").forEach(c => c.classList.toggle("on", c === b));
+});
+
+// Drop zone = entire window
+let depth = 0;
+window.addEventListener("dragenter", e => { e.preventDefault(); depth++; document.body.classList.add("dragging"); });
+window.addEventListener("dragleave", e => { e.preventDefault(); if (--depth <= 0) { depth = 0; document.body.classList.remove("dragging"); } });
+window.addEventListener("dragover", e => e.preventDefault());
+window.addEventListener("drop", e => {
+  e.preventDefault(); depth = 0; document.body.classList.remove("dragging");
+  addFiles(e.dataTransfer.files);
+});
+window.addEventListener("paste", e => { if (e.clipboardData.files.length) addFiles(e.clipboardData.files); });
+$("#pick").onclick = () => $("#input").click();
+$("#input").onchange = e => { addFiles(e.target.files); e.target.value = ""; };
+
+function kind(f) {
+  if (f.type.startsWith("image/")) return "image";
+  if (f.type === "application/pdf" || /\.pdf$/i.test(f.name)) return "pdf";
+  if (f.type.startsWith("text/") || /\.(txt|md|csv|html?|json)$/i.test(f.name)) return "text";
+  return null;
+}
+function addFiles(list) {
+  for (const f of list) {
+    if (!kind(f)) { alert(`"${f.name}" is not supported. Use images, PDF, or text files.`); continue; }
+    files.push(f);
+  }
+  renderFiles();
+}
+function renderFiles() {
+  const el = $("#files"); el.innerHTML = "";
+  files.forEach((f, i) => {
+    const d = document.createElement("div"); d.className = "file";
+    if (kind(f) === "image") { const img = document.createElement("img"); img.src = URL.createObjectURL(f); d.appendChild(img); }
+    else { const ic = document.createElement("div"); ic.className = "ic"; ic.textContent = kind(f) === "pdf" ? "📄" : "📝"; d.appendChild(ic); }
+    const n = document.createElement("div"); n.className = "nm"; n.textContent = f.name; d.appendChild(n);
+    const x = document.createElement("button"); x.textContent = "Remove"; x.onclick = () => { files.splice(i, 1); renderFiles(); };
+    d.appendChild(x); el.appendChild(d);
+  });
+  $("#go").disabled = !files.length;
+  $("#go").textContent = files.length ? `Translate ${files.length} file${files.length > 1 ? "s" : ""}` : "Translate";
+}
+
+function topicName() { return $("#topic").value.trim(); }
+
+$("#go").onclick = () => {
+  if (!$("#topic").value.trim()) { $("#topic").focus(); $("#topic").placeholder = "Please type a topic first"; $("#topic").style.borderColor = "#d92d20"; return; }
+  $("#topic").style.borderColor = "";
+  if (!CFG.apiKey) { $("#keyInput").focus(); return; }
+  $("#confirmText").textContent = `${files.length} file${files.length > 1 ? "s" : ""} · Topic: ${topicName()} · ${style === "verbatim" ? "Verbatim" : "Not verbatim"}`;
+  $("#confirm").style.display = "flex";
+};
+$("#no").onclick = () => $("#confirm").style.display = "none";
+let pending = null;
+$("#yes").onclick = () => { $("#confirm").style.display = "none"; (pending || runAll)(); pending = null; };
+$("#no").addEventListener("click", () => pending = null);
+function normUrl(u) { u = u.trim(); if (u && !/^https?:\/\//i.test(u)) u = "https://" + u; try { const h = new URL(u).href; try { return decodeURI(h); } catch { return h; } } catch { return ""; } }
+$("#link").addEventListener("keydown", e => { if (e.key === "Enter") $("#goLink").click(); });
+$("#goLink").onclick = () => {
+  const url = normUrl($("#link").value);
+  if (!url) { $("#link").focus(); $("#link").style.borderColor = "#d92d20"; $("#link").placeholder = "Paste a link first"; return; }
+  $("#link").style.borderColor = "";
+  if (!CFG.apiKey) { $("#keyBox").style.display = "block"; $("#keyInput").focus(); return; }
+  $("#confirmText").textContent = `Link: ${url} · ${style === "verbatim" ? "Verbatim" : "Not verbatim"}`;
+  pending = () => runLink(url);
+  $("#confirm").style.display = "flex";
+};
+
+const toB64 = f => new Promise((ok, bad) => { const r = new FileReader(); r.onload = () => ok(r.result.split(",")[1]); r.onerror = bad; r.readAsDataURL(f); });
+
+// Shrink big phone photos so many pages fit in one request
+async function imageBlock(f) {
+  try {
+    const bmp = await createImageBitmap(f);
+    const scale = Math.min(1, 2000 / Math.max(bmp.width, bmp.height));
+    const c = document.createElement("canvas");
+    c.width = Math.round(bmp.width * scale); c.height = Math.round(bmp.height * scale);
+    const x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height);
+    x.drawImage(bmp, 0, 0, c.width, c.height);
+    const blob = await new Promise(r => c.toBlob(r, "image/jpeg", 0.88));
+    return { type: "image", source: { type: "base64", media_type: "image/jpeg", data: await toB64(blob) } };
+  } catch {
+    let type = f.type; if (!["image/jpeg","image/png","image/gif","image/webp"].includes(type)) type = "image/jpeg";
+    return { type: "image", source: { type: "base64", media_type: type, data: await toB64(f) } };
+  }
+}
+
+const FORMAT_RULES = `FORMAT the English so it is easy to read and understand:
+- A short title as "# Title" at the top.
+- Use "## " section headings where the content has natural sections.
+- Short clear paragraphs separated by a blank line.
+- Use "- " bullets or "1. " numbered lists for lists, steps, or items.
+- Use "### " for smaller sub-headings inside a section.
+- Use *italics* for Indian/Sanskrit terms, book titles and names of texts, and add a short English meaning in parentheses the first time a term appears, e.g. *Upanayana* (sacred-thread initiation).
+- Use **bold** sparingly for the most important names, dates, and amounts.
+- No tables, no code blocks, no emojis, no images, no links.
+
+STRICT RULES:
+- Output ONLY English. Never include any Hindi/Devanagari text or transliteration.
+- Do NOT add any notes, disclaimers, comments, or remarks about handwriting, legibility, accuracy, uncertainty, the translation, the source, or the website. No "Note:", no "[illegible]", no "[unclear]".`;
+
+function styleRule() {
+  return style === "verbatim"
+    ? "Translate VERBATIM: keep every sentence and detail, word-for-word in meaning. Do not summarize, shorten, skip, or add content."
+    : "Translate into natural, fluent, easy-to-read English. Keep the full meaning and every detail, but phrase it the way a native English speaker would.";
+}
+
+function linkPrompt(url) {
+  return `Use the web_fetch tool to fetch this page: ${url}
+
+It is probably in Hindi (if parts are already English, keep them in English). Figure out the topic yourself from the content and use correct terminology for it.
+Take ONLY the main article/content of the page. Ignore menus, ads, cookie banners, sign-up boxes, related-article lists, comments, footers, and share buttons.
+
+${styleRule()}
+
+${FORMAT_RULES}
+
+Pick the PDF design theme that best fits the content, from: ${THEME_LIST}.
+
+After fetching, your reply must start with one line: THEME: <name>
+Then the formatted English document only — nothing before it (no "I'll fetch", no "Here is") and nothing after it. If the page cannot be fetched, reply with exactly: FETCH_FAILED`;
+}
+
+function buildPrompt(n) {
+  const t = topicName();
+  const s = style === "verbatim"
+    ? "Translate VERBATIM: keep every sentence and detail, word-for-word in meaning. Do not summarize, shorten, skip, or add content."
+    : "Translate into natural, fluent, easy-to-read English. Keep the full meaning and every detail, but phrase it the way a native English speaker would.";
+  return `You are an expert Hindi-to-English translator. The topic of this material is: ${t}. Use correct terminology for that topic.
+
+You were given ${n} file(s), labeled FILE 1 to FILE ${n}. They are pages or parts of the material and are probably NOT in the right order. Work out the correct reading order from page numbers, dates, headings, sentences that continue across pages, numbering, and context.
+
+${styleRule()}
+
+Read all Hindi (Devanagari) text, including handwriting. If a word is hard to read, use your best judgment from context and keep going silently.
+
+${FORMAT_RULES}
+- Do not mention file numbers, page numbers, or page order in the document. Never use "Page 1", "Page 2" etc. as headings — merge all pages into ONE continuous document organized by topic, with real descriptive section headings.
+- Do not repeat the main title as a heading again.
+
+Pick the PDF design theme that best fits the topic and content, from: ${THEME_LIST}.
+
+Your reply must start with exactly these two lines:
+ORDER: 3, 1, 2   (the correct order of the file numbers)
+THEME: <name>
+Then a line with only ---
+Then the formatted English document, and nothing else.`;
+}
+
+async function callClaude(content, onText, tools) {
+  const r = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "x-api-key": CFG.apiKey, "anthropic-version": "2023-06-01",
+      "content-type": "application/json", "anthropic-dangerous-direct-browser-access": "true",
+      ...(tools ? { "anthropic-beta": "web-fetch-2025-09-10" } : {})
+    },
+    body: JSON.stringify(Object.assign({ model: CFG.model || "claude-sonnet-4-5", max_tokens: 32000, stream: true,
+      messages: [{ role: "user", content }] }, tools ? { tools } : {}))
+  });
+  if (!r.ok) { let m = "HTTP " + r.status; try { m = (await r.json()).error.message; } catch {} throw new Error(m); }
+  const reader = r.body.getReader(), dec = new TextDecoder();
+  let buf = "", text = "";
+  while (true) {
+    const { done, value } = await reader.read(); if (done) break;
+    buf += dec.decode(value, { stream: true });
+    let k;
+    while ((k = buf.indexOf("\n\n")) >= 0) {
+      const ev = buf.slice(0, k); buf = buf.slice(k + 2);
+      const line = ev.split("\n").find(l => l.startsWith("data: ")); if (!line) continue;
+      let d; try { d = JSON.parse(line.slice(6)); } catch { continue; }
+      if (d.type === "content_block_start" && d.content_block && /tool_result/.test(d.content_block.type)) {
+        if (d.content_block.content && d.content_block.content.type === "web_fetch_tool_error") throw new Error("Could not open that link (" + (d.content_block.content.error_code || "error") + ")");
+        text = ""; onText && onText(text, true);
+      }
+      if (d.type === "content_block_delta" && d.delta.text) { text += d.delta.text; onText && onText(text); }
+      if (d.type === "error") throw new Error(d.error.message);
+    }
+  }
+  return text;
+}
+
+// Remove any notes/disclaimers and any Hindi characters that slip through
+function cleanDoc(md) {
+  let firstTitle = null;
+  return md.split("\n").filter(l => {
+    if (/^#{1,6}\s*\**\s*(page|pg\.?|पृष्ठ)\s*\d+\s*\**\s*$/i.test(l.trim()) || /^\**\s*(page|pg\.?)\s*\d+\s*\**$/i.test(l.trim())) return false;
+    const hm = l.match(/^#{1,6}\s+(.*)/);
+    if (hm) { const h = hm[1].replace(/[*_]/g, "").trim().toLowerCase(); if (firstTitle === null) firstTitle = h; else if (h === firstTitle) return false; }
+    const t = l.replace(/[*_>\[\]()#\s]/g, " ").trim();
+    if (/^(note|notes|translator'?s? note|translation note|disclaimer|please note)\b/i.test(t)) return false;
+    if (/(handwriting|legib|illegib|transcription may|may contain inaccurac|unclear)/i.test(t) && /(note|may|due to|some words)/i.test(t)) return false;
+    return true;
+  }).join("\n")
+    .replace(/[\u0900-\u097F]+/g, "")
+    .replace(/\[(?:unclear|illegible|uncertain)\s*:\s*([^\]]*)\]/gi, "$1")
+    .replace(/\[(?:unclear|illegible|uncertain|\?)[^\]]*\]/gi, "")
+    .replace(/\n{3,}/g, "\n\n").trim();
+}
+
+function pdfSafe(t) {
+  return t.replace(/[\u2018\u2019\u02BC]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/[\u2013\u2014\u2212]/g, "-")
+          .replace(/\u2026/g, "...").replace(/\u00A0/g, " ").replace(/[\u2022\u25CF]/g, "-").replace(/[^\x09\x0A\x0D\x20-\x7E\u00A1-\u00FF]/g, "");
+}
+
+const THEMES = {
+  classic:   { body: "times",     head: "times",     sub: "helvetica", accent: [128, 38, 28],  title: "left",   rule: "single", bullet: "dot",    desc: "history, culture, archaeology, literature, general study notes" },
+  education: { body: "times",     head: "helvetica", sub: "helvetica", accent: [88, 44, 150],  title: "left",   rule: "thick",  bullet: "square", desc: "school lessons, exam prep (UPSC etc.), textbooks, homework" },
+  medical:   { body: "helvetica", head: "helvetica", sub: "helvetica", accent: [0, 112, 120],  title: "left",   rule: "band",   bullet: "dot",    desc: "medical reports, prescriptions, health, hospital papers" },
+  legal:     { body: "times",     head: "times",     sub: "times",     accent: [22, 38, 82],   title: "center", rule: "double", bullet: "dash",   desc: "legal documents, court papers, contracts, property, affidavits, government notices" },
+  science:   { body: "helvetica", head: "helvetica", sub: "helvetica", accent: [20, 90, 200],  title: "left",   rule: "thick",  bullet: "square", desc: "science, maths, technology, engineering, agriculture" },
+  religious: { body: "times",     head: "times",     sub: "times",     accent: [190, 90, 10],  title: "center", rule: "orn",    bullet: "diamond",desc: "religion, scripture, spirituality, prayers, philosophy, mythology" },
+  letter:    { body: "times",     head: "times",     sub: "times",     accent: [110, 75, 45],  title: "left",   rule: "none",   bullet: "dash",   desc: "personal or family letters, diaries, stories, poems" },
+  business:  { body: "helvetica", head: "helvetica", sub: "helvetica", accent: [30, 95, 70],   title: "left",   rule: "band",   bullet: "square", desc: "business, finance, banking, invoices, office documents" },
+  news:      { body: "times",     head: "helvetica", sub: "helvetica", accent: [180, 20, 30],  title: "left",   rule: "thick",  bullet: "dot",    desc: "news articles, current affairs, blogs, magazine articles" }
+};
+const THEME_LIST = Object.entries(THEMES).map(([k, v]) => `${k} (${v.desc})`).join("; ");
+
+function parseHeader(raw) {
+  let order = [], theme = "classic", body = raw;
+  for (let k = 0; k < 4; k++) {
+    let m;
+    if ((m = body.match(/^\s*ORDER:\s*([^\n]*)\n/i))) { order = (m[1].match(/\d+/g) || []).map(Number); body = body.slice(m[0].length); continue; }
+    if ((m = body.match(/^\s*THEME:\s*([a-z]+)[^\n]*\n/i))) { if (THEMES[m[1].toLowerCase()]) theme = m[1].toLowerCase(); body = body.slice(m[0].length); continue; }
+    if ((m = body.match(/^\s*-{3,}\s*\n/))) { body = body.slice(m[0].length); continue; }
+    break;
+  }
+  const i = body.search(/^#\s/m);
+  if (i > 0 && i < 400) body = body.slice(i);
+  return { order, theme, body };
+}
+
+function makePdf(md, subtitle, themeName) {
+  const T = THEMES[themeName] || THEMES.classic;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
+  const M = 62, TOP = 60, BOTTOM = 70, maxW = W - 2 * M;
+  const MAROON = T.accent, INK = [28, 28, 28], GREY = [110, 110, 110];
+  const BODY = T.body, BSIZE = T.body === "helvetica" ? 10.5 : 11.5;
+  let y = TOP;
+  const need = h => { if (y + h > H - BOTTOM) { doc.addPage(); y = TOP; } };
+  const lines = md.split("\n");
+  let title = "Translation";
+  const ti = lines.findIndex(l => /^#\s+/.test(l));
+  if (ti >= 0) { title = lines[ti].replace(/^#\s+/, "").replace(/[*_]/g, "").trim(); lines.splice(ti, 1); }
+
+  // Word-wrapped rich text: **bold**, *italic*
+  function rich(text, o) {
+    const font = o.font || BODY, size = o.size || BSIZE, lh = o.lh || size * 1.45, indent = o.indent || 0;
+    const words = []; let pendSpace = false;
+    const re = /(\*\*[^*]+\*\*|\*[^*\s][^*]*\*)/g;
+    pdfSafe(text).split(re).forEach(seg => {
+      if (!seg) return;
+      let st = o.bold ? "bold" : "normal";
+      if (/^\*\*.*\*\*$/.test(seg)) { seg = seg.slice(2, -2); st = "bold"; }
+      else if (/^\*.*\*$/.test(seg)) { seg = seg.slice(1, -1); st = st === "bold" ? "bolditalic" : "italic"; }
+      seg.split(/(\s+)/).forEach(w => {
+        if (!w) return;
+        if (/^\s+$/.test(w)) { pendSpace = true; return; }
+        words.push({ w, st, glue: words.length > 0 && !pendSpace }); pendSpace = false;
+      });
+    });
+    doc.setFontSize(size); doc.setTextColor(...(o.color || INK));
+    need(lh);
+    let x = M + indent, first = true;
+    if (o.onFirstLine) o.onFirstLine(y);
+    words.forEach(wd => {
+      doc.setFont(font, wd.st);
+      const ww = doc.getTextWidth(wd.w);
+      doc.setFont(font, "normal"); const sp = doc.getTextWidth(" ");
+      let xx = first ? x : (wd.glue ? x : x + sp);
+      if (!first && xx + ww > M + maxW) { y += lh; need(lh); xx = M + indent; }
+      doc.setFont(font, wd.st); doc.text(wd.w, xx, y);
+      x = xx + ww; first = false;
+    });
+    y += lh;
+  }
+
+  // Title block
+  const cx = T.title === "center", tx = cx ? W / 2 : M, al = { align: cx ? "center" : "left" };
+  if (T.rule === "band") { doc.setFillColor(...MAROON); doc.rect(0, 0, W, 14, "F"); y += 6; }
+  if (T.rule === "orn") { doc.setDrawColor(...MAROON); doc.setLineWidth(0.6); doc.line(W/2 - 70, y - 18, W/2 - 8, y - 18); doc.line(W/2 + 8, y - 18, W/2 + 70, y - 18); doc.setFillColor(...MAROON); doc.lines([[4,-4],[4,4],[-4,4],[-4,-4]], W/2 - 4, y - 18, [1,1], "F", true); }
+  doc.setFont(T.head, "bold"); doc.setFontSize(T.head === "helvetica" ? 23 : 26);
+  doc.setTextColor(...(T.rule === "none" || T.rule === "orn" || T.rule === "band" ? MAROON : INK));
+  doc.splitTextToSize(pdfSafe(title), maxW).forEach(t => { doc.text(t, tx, y + 8, al); y += 30; });
+  if (subtitle) { doc.setFont(T.sub, T.sub === "times" ? "italic" : "normal"); doc.setFontSize(9.5); doc.setTextColor(...GREY); doc.text(pdfSafe(subtitle), tx, y - 4, Object.assign({ maxWidth: maxW }, al)); y += 6; }
+  doc.setDrawColor(...MAROON);
+  if (T.rule === "single") { doc.setLineWidth(0.8); doc.line(M, y, W - M, y); }
+  else if (T.rule === "thick") { doc.setLineWidth(2.5); doc.line(M, y, W - M, y); }
+  else if (T.rule === "double") { doc.setLineWidth(1.2); doc.line(M, y, W - M, y); doc.setLineWidth(0.4); doc.line(M, y + 3.5, W - M, y + 3.5); }
+  else if (T.rule === "band") { doc.setLineWidth(0.6); doc.line(M, y, W - M, y); }
+  else if (T.rule === "orn") { doc.setLineWidth(0.6); doc.line(W/2 - 90, y, W/2 + 90, y); }
+  y += T.rule === "none" ? 14 : 30;
+
+  lines.forEach(raw => {
+    const line = raw.replace(/\s+$/, "");
+    let m;
+    if (!line.trim()) { y += 5; return; }
+    if (/^(-{3,}|\*{3,}|_{3,})$/.test(line.trim())) { need(16); doc.setDrawColor(200); doc.setLineWidth(0.5); doc.line(M, y, W - M, y); y += 14; return; }
+    if ((m = line.match(/^##\s+(.*)/)) && !/^###/.test(line)) { y += 10; need(40); if (T.rule === "band" || T.head === "helvetica") { rich(m[1].replace(/\*/g, ""), { font: T.head, size: 15, bold: true, color: MAROON, lh: 21 }); doc.setDrawColor(...MAROON); doc.setLineWidth(0.5); doc.line(M, y - 13, M + 60, y - 13); y += 6; }
+      else rich(m[1].replace(/\*/g, ""), { font: T.head, size: 17, bold: true, color: MAROON, lh: 24 });
+      y += 4; return; }
+    if ((m = line.match(/^#{1,6}\s+(.*)/))) { y += 6; need(34); rich(m[1].replace(/\*/g, ""), { font: T.head === "times" && T.title === "center" ? "times" : "helvetica", size: 11.5, bold: true, color: T.title === "center" ? MAROON : INK, lh: 17 }); y += 2; return; }
+    if ((m = line.match(/^(\s*)[-*+\u2022]\s+(.*)/))) {
+      const ind = 18 + Math.min(m[1].length, 8) * 5;
+      rich(m[2], { indent: ind, onFirstLine: yy => {
+        const bx = M + ind - 12, by = yy - 3.6; doc.setFillColor(...MAROON); doc.setDrawColor(...MAROON);
+        if (T.bullet === "square") doc.rect(bx - 1.8, by - 1.8, 3.6, 3.6, "F");
+        else if (T.bullet === "dash") { doc.setLineWidth(0.9); doc.line(bx - 3, by, bx + 3, by); }
+        else if (T.bullet === "diamond") doc.lines([[2.4,-2.4],[2.4,2.4],[-2.4,2.4],[-2.4,-2.4]], bx - 2.4, by, [1,1], "F", true);
+        else { doc.setFillColor(...INK); doc.circle(bx, by, 1.6, "F"); }
+      } });
+      y += 3; return;
+    }
+    if ((m = line.match(/^(\s*)(\d+[.)])\s+(.*)/))) {
+      const ind = 22 + Math.min(m[1].length, 8) * 5;
+      rich(m[3], { indent: ind, onFirstLine: yy => { doc.setFont(BODY, "bold"); doc.setFontSize(BSIZE); doc.setTextColor(...MAROON); doc.text(m[2], M + ind - 20, yy); doc.setTextColor(...INK); doc.setFont(BODY, "normal"); } });
+      y += 3; return;
+    }
+    rich(line.replace(/^>\s?/, ""), {}); y += 4;
+  });
+
+  const n = doc.getNumberOfPages();
+  for (let p = 1; p <= n; p++) {
+    doc.setPage(p); doc.setFont(T.sub, "normal"); doc.setFontSize(8.5); doc.setTextColor(...GREY);
+    if (T.rule === "band") { doc.setFillColor(...MAROON); doc.rect(0, H - 8, W, 8, "F"); }
+    doc.text(pdfSafe(title), M, H - 34);
+    doc.text(`Page ${p}`, W - M, H - 34, { align: "right" });
+  }
+  return doc.output("blob");
+}
+
+async function runAll() {
+  if (!CFG.apiKey) { $("#keyBox").style.display = "block"; $("#keyInput").focus(); return; }
+  const batch = files.slice(); files = []; renderFiles();
+  const out = $("#results");
+  const card = document.createElement("div"); card.className = "res wait";
+  card.innerHTML = `<h3>Translating ${batch.length} file${batch.length > 1 ? "s" : ""}…</h3><div class="txt">Please wait. Your PDF will appear here.</div>`;
+  out.prepend(card);
+  card.scrollIntoView({ behavior: "smooth" });
+  try {
+    const content = [];
+    for (let i = 0; i < batch.length; i++) {
+      const f = batch[i], k = kind(f);
+      content.push({ type: "text", text: `FILE ${i + 1} (${f.name}):` });
+      if (k === "image") content.push(await imageBlock(f));
+      else if (k === "pdf") content.push({ type: "document", source: { type: "base64", media_type: "application/pdf", data: await toB64(f) } });
+      else content.push({ type: "text", text: await f.text() });
+    }
+    content.push({ type: "text", text: buildPrompt(batch.length) });
+    const raw = await callClaude(content);
+    let { order, theme, body } = parseHeader(raw);
+    order = order.filter(n => n >= 1 && n <= batch.length);
+    const sub = `English translation of Hindi ${batch.some(f => kind(f) === "image") ? "notes" : "text"}  |  Topic: ${topicName()}` + (order.length > 1 ? `  |  Page order used: ${order.join(", ")}` : "");
+    showResult(card, cleanDoc(body), sub, theme);
+  } catch (e) { showError(card, e); }
+}
+
+function showError(card, e) {
+  card.className = "res err";
+  card.innerHTML = "<h3>Error</h3>";
+  const t = document.createElement("div"); t.className = "txt"; t.textContent = e.message; card.appendChild(t);
+}
+
+async function runLink(url) {
+  const out = $("#results");
+  const card = document.createElement("div"); card.className = "res wait";
+  card.innerHTML = `<h3></h3><div class="txt">Please wait. Your PDF will appear here.</div>`;
+  card.querySelector("h3").textContent = "Translating " + url;
+  out.prepend(card); card.scrollIntoView({ behavior: "smooth" });
+  try {
+    const raw = await callClaude([{ type: "text", text: linkPrompt(url) }], null, [{ type: "web_fetch_20250910", name: "web_fetch", max_uses: 3, max_content_tokens: 60000 }]);
+    if (/FETCH_FAILED/.test(raw) && raw.length < 200) throw new Error("Could not open that link. Check it and try again.");
+    const { theme, body } = parseHeader(raw);
+    const md = cleanDoc(body);
+    if (!md) throw new Error("No content found on that page.");
+    showResult(card, md, "English translation of " + new URL(url).hostname.replace(/^www\./, ""), theme);
+    $("#link").value = "";
+  } catch (e) { showError(card, e); }
+}
+
+function showResult(card, md, subtitle, theme) {
+  const blob = makePdf(md, subtitle, theme);
+  const url = URL.createObjectURL(blob);
+  const titleM = md.match(/^#\s+(.+)/m);
+  const fname = (titleM ? pdfSafe(titleM[1]).replace(/[*_]/g, "").replace(/[^\w\- ]+/g, "").trim().slice(0, 60) : "Translation").replace(/\s+/g, "_") + "_English.pdf";
+  card.className = "res done"; card.innerHTML = "";
+  const a = document.createElement("a"); a.className = "dl"; a.href = url; a.download = fname; a.dataset.theme = theme || "";
+  a.textContent = "⬇ Download PDF"; card.appendChild(a);
+  const n = document.createElement("div"); n.className = "fname"; n.textContent = fname; card.appendChild(n);
+  a.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+</script>
+</body>
+</html>

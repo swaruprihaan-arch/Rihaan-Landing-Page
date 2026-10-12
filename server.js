@@ -59,7 +59,22 @@ function notFound(req, res) {
   send(res, 404, 'Not found', 'text/plain; charset=utf-8');
 }
 
+/* Short project URLs: rihaan.net/<name>/... serves projects/<folder>/...
+   (the old /projects/<folder>/ URLs keep working). */
+const PROJECT_ALIASES = {
+  'landing-page': 'rihaan-landing-page',
+  'tower-defence-2': 'tower-defence-2',
+  'kathleen': 'kathleen',
+  'recipe-finder': 'mama-recipe-finder',
+  'brickforge': 'lego-brickforge',
+  'translator': 'dadu-translator'
+};
+
 function resolve(urlPath) {
+  const seg = urlPath.split('/')[1];
+  if (Object.prototype.hasOwnProperty.call(PROJECT_ALIASES, seg)) {
+    urlPath = '/projects/' + PROJECT_ALIASES[seg] + urlPath.slice(seg.length + 1);
+  }
   let decoded;
   try { decoded = decodeURIComponent(urlPath); } catch (e) { return null; }
   if (decoded.includes('\0')) return null;

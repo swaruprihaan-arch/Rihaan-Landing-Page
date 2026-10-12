@@ -7,14 +7,15 @@
   'use strict';
 
   const PROJECTS = [
-    { slug: 'rihaan-landing-page', title: 'Rihaan Landing Page', desc: "This site's landing page — soccer-inspired hero, AI integrations row and the animated wordmark reveal.", repo: 'https://github.com/swaruprihaan-arch/Rihaan-Landing-Page' },
-    { slug: 'tower-defence-2', title: 'Tower Defence 2', desc: 'A browser tower-defense game with escalating waves, built to be tough from the very first level.' },
-    { slug: 'kathleen', title: 'Kathleen Treseder Campaign', desc: 'A student campaign site for Irvine City Council, District 6 — every claim links to a public source.', repo: 'https://github.com/swaruprihaan-arch/Kathleen_BioGlow' },
-    { slug: 'mama-recipe-finder', title: 'Recipe Finder', desc: 'Search and discover recipes with an AI Chef assistant, pulling live data from TheMealDB.', repo: 'https://github.com/swaruprihaan-arch/Recipe-Finder' },
+    { slug: 'rihaan-landing-page', title: 'Rihaan Landing Page', desc: "This site's landing page — soccer-inspired hero, AI integrations row and the animated wordmark reveal.", path: '/landing-page/', repo: 'https://github.com/swaruprihaan-arch/Rihaan-Landing-Page' },
+    { slug: 'tower-defence-2', title: 'Tower Defence 2', desc: 'A browser tower-defense game with escalating waves, built to be tough from the very first level.', path: '/tower-defence-2/' },
+    { slug: 'kathleen', title: 'Kathleen Treseder Campaign', desc: 'A student campaign site for Irvine City Council, District 6 — every claim links to a public source.', path: '/kathleen/', repo: 'https://github.com/swaruprihaan-arch/Kathleen_BioGlow' },
+    { slug: 'mama-recipe-finder', title: 'Recipe Finder', desc: 'Search and discover recipes with an AI Chef assistant, pulling live data from TheMealDB.', path: '/recipe-finder/', repo: 'https://github.com/swaruprihaan-arch/Recipe-Finder' },
     { slug: 'workflow-pipeline', title: 'Brick Route', desc: 'An interactive, LEGO-themed walkthrough of an analysis workflow pipeline.' },
-    { slug: 'lego-brickforge', title: 'BrickForge', desc: '3D LEGO build instructions viewer powered by the Rebrickable API.', repo: 'https://github.com/swaruprihaan-arch/Lego_Bricks' },
-    { slug: 'math', title: 'Math Lab', desc: 'Brick-themed math practice for kids — whole numbers, fractions, decimals, order of operations, word problems and K-8 grade-level math.', path: './math/', repo: 'https://github.com/swaruprihaan-arch/Math' },
-    { slug: 'mrs-hill-owl', title: 'Owls: Calm & Mystical Encyclopedia', desc: 'A species guide to owls with scrollable, fullscreen galleries.', path: './mrs-hill-owl/' }
+    { slug: 'lego-brickforge', title: 'BrickForge', desc: '3D LEGO build instructions viewer powered by the Rebrickable API.', path: '/brickforge/', repo: 'https://github.com/swaruprihaan-arch/Lego_Bricks' },
+    { slug: 'math', title: 'Math Lab', desc: 'Brick-themed math practice for kids — whole numbers, fractions, decimals, order of operations, word problems and K-8 grade-level math.', path: '/math/', repo: 'https://github.com/swaruprihaan-arch/Math' },
+    { slug: 'mrs-hill-owl', title: 'Owls: Calm & Mystical Encyclopedia', desc: 'A species guide to owls with scrollable, fullscreen galleries.', path: './mrs-hill-owl/' },
+    { slug: 'dadu-translator', title: 'Hindi → English Translator', desc: 'Translates Hindi images, PDFs, text files and links into English, word-for-word or in natural, easy English.', path: '/translator/', repo: 'https://github.com/swaruprihaan-arch/dadu-translator-' }
   ];
   const PREVIEW_WIDTH = 1280;
 
