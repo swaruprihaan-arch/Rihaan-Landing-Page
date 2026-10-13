@@ -31,7 +31,6 @@
     position: fixed; inset: 0; border: 10px dashed #9a927f; pointer-events: none; z-index: 30;
   }
   body.dragging #frame { border-color: #1f5eff; border-style: solid; }
-  #keyBox { display: none; margin-bottom: 30px; }
   .drop {
     margin-top: 40px; border: none; border-radius: 30px; background: #fff;
     padding: 70px 20px; text-align: center; cursor: pointer; font-size: 36px; font-weight: 700;
@@ -93,7 +92,6 @@
 <main>
   <h1>Hindi → English</h1>
   <p class="sub">Drop files or images anywhere on the screen</p>
-  <div id="keyBox"><div class="label">API key</div><input id="keyInput" class="big-input" type="password" placeholder="Paste your Anthropic API key (saved only in this browser)"></div>
 
   <div class="label">1. Topic</div>
   <input id="topic" class="big-input" placeholder="Type the topic (for example: medical report, wedding letter)…">
@@ -132,18 +130,9 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="config.js"></script>
 <script>
-const CFG = window.TRANSLATOR_CONFIG || {};
-if (!CFG.apiKey) {
-  CFG.apiKey = localStorage.getItem("anthropicKey") || "";
-  if (!CFG.apiKey) {
-    document.getElementById("keyBox").style.display = "block";
-    document.getElementById("keyInput").addEventListener("input", e => {
-      CFG.apiKey = e.target.value.trim(); localStorage.setItem("anthropicKey", CFG.apiKey);
-    });
-  }
-}
+// The Anthropic key lives on the rihaan.net server; the page calls /api/translate.
+try { localStorage.removeItem("anthropicKey"); } catch {}
 let style = "verbatim", files = [];
 
 const $ = s => document.querySelector(s);
@@ -197,7 +186,6 @@ function topicName() { return $("#topic").value.trim(); }
 $("#go").onclick = () => {
   if (!$("#topic").value.trim()) { $("#topic").focus(); $("#topic").placeholder = "Please type a topic first"; $("#topic").style.borderColor = "#d92d20"; return; }
   $("#topic").style.borderColor = "";
-  if (!CFG.apiKey) { $("#keyInput").focus(); return; }
   $("#confirmText").textContent = `${files.length} file${files.length > 1 ? "s" : ""} · Topic: ${topicName()} · ${style === "verbatim" ? "Verbatim" : "Not verbatim"}`;
   $("#confirm").style.display = "flex";
 };
@@ -211,7 +199,6 @@ $("#goLink").onclick = () => {
   const url = normUrl($("#link").value);
   if (!url) { $("#link").focus(); $("#link").style.borderColor = "#d92d20"; $("#link").placeholder = "Paste a link first"; return; }
   $("#link").style.borderColor = "";
-  if (!CFG.apiKey) { $("#keyBox").style.display = "block"; $("#keyInput").focus(); return; }
   $("#confirmText").textContent = `Link: ${url} · ${style === "verbatim" ? "Verbatim" : "Not verbatim"}`;
   pending = () => runLink(url);
   $("#confirm").style.display = "flex";
@@ -299,17 +286,12 @@ Then the formatted English document, and nothing else.`;
 }
 
 async function callClaude(content, onText, tools) {
-  const r = await fetch("https://api.anthropic.com/v1/messages", {
+  const r = await fetch("/api/translate", {
     method: "POST",
-    headers: {
-      "x-api-key": CFG.apiKey, "anthropic-version": "2023-06-01",
-      "content-type": "application/json", "anthropic-dangerous-direct-browser-access": "true",
-      ...(tools ? { "anthropic-beta": "web-fetch-2025-09-10" } : {})
-    },
-    body: JSON.stringify(Object.assign({ model: CFG.model || "claude-sonnet-4-5", max_tokens: 32000, stream: true,
-      messages: [{ role: "user", content }] }, tools ? { tools } : {}))
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ content, webFetch: !!tools })
   });
-  if (!r.ok) { let m = "HTTP " + r.status; try { m = (await r.json()).error.message; } catch {} throw new Error(m); }
+  if (!r.ok) { let m = "HTTP " + r.status; try { const j = await r.json(); m = j.error && j.error.message || j.error || m; } catch {} throw new Error(m); }
   const reader = r.body.getReader(), dec = new TextDecoder();
   let buf = "", text = "";
   while (true) {
@@ -483,7 +465,6 @@ function makePdf(md, subtitle, themeName) {
 }
 
 async function runAll() {
-  if (!CFG.apiKey) { $("#keyBox").style.display = "block"; $("#keyInput").focus(); return; }
   const batch = files.slice(); files = []; renderFiles();
   const out = $("#results");
   const card = document.createElement("div"); card.className = "res wait";

@@ -163,8 +163,70 @@ async function handleContact(req, res) {
   } catch (err) { console.error('contact:', err.message); json(502, { ok: false, error: 'Could not send right now. Please try again shortly.' }); }
 }
 
+/* ---------------- Translator -> Anthropic (server-side key) ----------------
+   POST /api/translate  {content: [...message content blocks], webFetch: bool}
+   The key lives only in the ANTHROPIC_API_KEY env var on Railway. Model,
+   max_tokens and tools are fixed here, so the endpoint can only be used the
+   way the translator page uses it. The response is Anthropic's SSE stream,
+   piped through unchanged. */
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
+const TRANSLATE_MODEL = process.env.TRANSLATE_MODEL || 'claude-sonnet-4-5';
+const translateHits = new Map(); /* ip -> [timestamps] : 30 per hour */
+
+function translateTooMany(ip) {
+  const now = Date.now(); const win = 60 * 60 * 1000;
+  const list = (translateHits.get(ip) || []).filter((t) => now - t < win);
+  list.push(now); translateHits.set(ip, list);
+  if (translateHits.size > 5000) translateHits.clear();
+  return list.length > 30;
+}
+
+async function handleTranslate(req, res) {
+  const json = (status, msg) => send(res, status, JSON.stringify({ ok: false, error: msg }), 'application/json; charset=utf-8', { 'Cache-Control': 'no-store' });
+  if (!ANTHROPIC_API_KEY) { console.error('translate: ANTHROPIC_API_KEY not set'); json(503, 'The translator is not set up yet.'); return; }
+  const origin = req.headers.origin;
+  if (origin && !/^https?:\/\/(rihaan\.net|www\.rihaan\.net|localhost(:\d+)?|[a-z0-9-]+\.up\.railway\.app)$/i.test(origin)) { json(403, 'Not allowed.'); return; }
+  const ip = String(req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+  if (translateTooMany(ip)) { json(429, 'Too many translations. Please try again in a while.'); return; }
+  let data;
+  try { data = await readJson(req, 40 * 1024 * 1024); } catch (e) { json(400, e.message === 'too large' ? 'Those files are too big. Try fewer at once.' : 'Invalid request.'); return; }
+  const content = data.content;
+  if (!Array.isArray(content) || !content.length || content.length > 200 || !content.every((b) => b && ['text', 'image', 'document'].includes(b.type))) { json(400, 'Invalid request.'); return; }
+
+  const body = { model: TRANSLATE_MODEL, max_tokens: 32000, stream: true, messages: [{ role: 'user', content }] };
+  const headers = { 'x-api-key': ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' };
+  if (data.webFetch) {
+    body.tools = [{ type: 'web_fetch_20250910', name: 'web_fetch', max_uses: 3, max_content_tokens: 60000 }];
+    headers['anthropic-beta'] = 'web-fetch-2025-09-10';
+  }
+  const ctrl = new AbortController();
+  res.on('close', () => { if (!res.writableFinished) ctrl.abort(); });
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers, body: JSON.stringify(body), signal: ctrl.signal });
+    if (!r.ok) {
+      const t = await r.text();
+      console.error('translate: anthropic', r.status, t.slice(0, 300));
+      let msg = 'Translation failed (' + r.status + '). Please try again.';
+      try { const m = JSON.parse(t).error.message; if (m && r.status < 500 && r.status !== 401 && r.status !== 403) msg = m; } catch (e) { /* keep generic */ }
+      json(r.status === 429 || r.status === 529 ? 503 : 502, msg); return;
+    }
+    res.writeHead(200, { 'Content-Type': 'text/event-stream; charset=utf-8', 'Cache-Control': 'no-store', 'X-Accel-Buffering': 'no', 'X-Content-Type-Options': 'nosniff' });
+    const reader = r.body.getReader();
+    for (;;) { const { done, value } = await reader.read(); if (done) break; res.write(Buffer.from(value)); }
+    res.end();
+  } catch (err) {
+    if (ctrl.signal.aborted) return;
+    console.error('translate:', err.message);
+    if (!res.headersSent) json(502, 'Translation failed. Please try again.'); else res.end();
+  }
+}
+
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, 'http://localhost');
+  if (url.pathname === '/api/translate') {
+    if (req.method === 'POST') { handleTranslate(req, res); return; }
+    send(res, 405, 'Method not allowed', 'text/plain; charset=utf-8', { Allow: 'POST' }); return;
+  }
   if (url.pathname === '/api/contact') {
     if (req.method === 'POST') { handleContact(req, res); return; }
     send(res, 405, 'Method not allowed', 'text/plain; charset=utf-8', { Allow: 'POST' }); return;
