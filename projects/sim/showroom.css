@@ -1,0 +1,4 @@
+/* CONTRAIL Racing — Showroom styles (cars/SPEC.md §6). Placeholder until the implementation lands. */
+.race-mode{--amber:#FF8A1F;--amber-ink:#1A0D00;--amber-dim:rgba(255,138,31,.14)}
+.ac .pic .gphoto,.profile .gphoto{width:100%;height:100%;object-fit:cover;border-radius:10px}
+.hero .art .hero-photo{width:100%;height:100%;object-fit:cover;border-radius:12px}

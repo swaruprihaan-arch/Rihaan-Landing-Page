@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0e141d">
+<meta name="description" content="Choose your simulator: explore 43 aircraft and 26 airports, or race eight cars across five circuits.">
+<title>SIM — Flight &amp; Racing Simulators</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="polish.css">
+<link rel="stylesheet" href="portal.css">
+<link rel="stylesheet" href="showroom.css">
+</head>
+<body>
+<a class="skip-link" href="#page" onclick="var page=document.getElementById('page');if(page){event.preventDefault();page.focus();}">Skip to content</a>
+<div id="app"><div class="boot" role="status"><span class="boot-mark" aria-hidden="true">✈</span><strong>CONTRAIL</strong><span>Preparing your flight deck…</span></div></div>
+<div id="flight" role="region" aria-label="Flight view"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="data.js"></script>
+<script src="art.js"></script>
+<script src="builder.js"></script>
+<script src="keypad.js"></script>
+<script src="sim.js"></script>
+<script src="ext.js"></script>
+<script src="showroom.js"></script>
+<script src="race.js"></script>
+<script src="app.js"></script>
+<script src="portal.js"></script>
+<script>setTimeout(function(){ if(!window.CT_UI){ document.getElementById('app').innerHTML='<div style="padding:40px;color:#FF6B6B;font-family:sans-serif">CONTRAIL failed to start. Open the browser console for details.</div>'; } }, 4000);</script>
+</body>
+</html>

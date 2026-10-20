@@ -15,7 +15,8 @@
     { slug: 'lego-brickforge', title: 'BrickForge', desc: '3D LEGO build instructions viewer powered by the Rebrickable API.', path: '/brickforge/', repo: 'https://github.com/swaruprihaan-arch/Lego_Bricks' },
     { slug: 'math', title: 'Math Lab', desc: 'Brick-themed math practice for kids — whole numbers, fractions, decimals, order of operations, word problems and K-8 grade-level math.', path: '/math/', repo: 'https://github.com/swaruprihaan-arch/Math' },
     { slug: 'mrs-hill-owl', title: 'Owls: Calm & Mystical Encyclopedia', desc: 'A species guide to owls with scrollable, fullscreen galleries.', path: './mrs-hill-owl/' },
-    { slug: 'dadu-translator', title: 'Hindi → English Translator', desc: 'Translates Hindi images, PDFs, text files and links into English, word-for-word or in natural, easy English.', path: '/translator/', repo: 'https://github.com/swaruprihaan-arch/dadu-translator-' }
+    { slug: 'dadu-translator', title: 'Hindi → English Translator', desc: 'Translates Hindi images, PDFs, text files and links into English, word-for-word or in natural, easy English.', path: '/translator/', repo: 'https://github.com/swaruprihaan-arch/dadu-translator-' },
+    { slug: 'sim', title: 'SIM — Flight & Racing Simulators', desc: 'Browser 3D flight simulator with 43 aircraft and 26 airports, plus a racing simulator with AI rivals. Build your own planes and cars.', path: '/sim/', repo: 'https://github.com/swaruprihaan-arch/Rihaan-Derek-Cavan-Sim' }
   ];
   const PREVIEW_WIDTH = 1280;
 

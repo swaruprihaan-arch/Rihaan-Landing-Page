@@ -67,7 +67,8 @@ const PROJECT_ALIASES = {
   'kathleen': 'kathleen',
   'recipe-finder': 'mama-recipe-finder',
   'brickforge': 'lego-brickforge',
-  'translator': 'dadu-translator'
+  'translator': 'dadu-translator',
+  'sim': 'sim'
 };
 
 function resolve(urlPath) {
